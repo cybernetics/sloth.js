@@ -76,9 +76,9 @@ module.exports = {
         test.done();
     },
 
-    testUnwrap: function(test) {
+    testForce: function(test) {
         test.expect(1);
-        test.deepEqual([1, 2, 3, 4], sloth.wrap(sloth.iterArray([1, 2, 3, 4])).unwrap());
+        test.deepEqual([1, 2, 3, 4], sloth.wrap(sloth.iterArray([1, 2, 3, 4])).force());
         test.done();
     },
 

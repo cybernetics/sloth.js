@@ -145,10 +145,10 @@
                  * This is a strict operation.
                  */
                 foldr: function(f, acc) {
-                    iter = sloth.wrap(iter).reverse().next;
+                    var reverseIter = sloth.wrap(iter).reverse().next;
 
-                    if(typeof acc === 'undefined') acc = iter();
-                    sloth.wrap(iter).each(function(x) {
+                    if(typeof acc === 'undefined') acc = reverseIter();
+                    sloth.wrap(reverseIter).each(function(x) {
                         acc = f(acc, x);
                     });
                     return acc;
@@ -163,8 +163,6 @@
                 all: function(f) {
                     if(typeof f === "undefined") f = sloth.id;
 
-                    iter = sloth.wrap(iter).map(f).next;
-
                     for(;;) {
                         try {
                             var value = iter();
@@ -172,7 +170,7 @@
                             if(e == sloth.StopIteration) break;
                             throw e;
                         }
-                        if(!value) return false;
+                        if(!f(value)) return false;
                     }
                     return true;
                 },
@@ -186,8 +184,6 @@
                 any: function(f) {
                     if(typeof f === "undefined") f = sloth.id;
 
-                    iter = sloth.wrap(iter).map(f).next;
-
                     for(;;) {
                         try {
                             var value = iter();
@@ -195,7 +191,7 @@
                             if(e == sloth.StopIteration) break;
                             throw e;
                         }
-                        if(value) return true;
+                        if(f(value)) return true;
                     }
                     return false;
                 },
