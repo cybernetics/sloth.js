@@ -99,19 +99,18 @@
                 },
 
                 /*
-                 * `unwrap` gets all the elements from the iterator and places
+                 * `force` gets all the elements from the iterator and places
                  * them into an array.
                  *
                  * This is a strict operation.
                  */
-                unwrap: function(f) {
+                force: function(f) {
                     var output = [];
                     sloth.wrap(iter).each(function(x) {
                         output.push(x);
                     });
                     return output;
                 },
-
 
                 /*
                  * `reverse` reverses the underlying iterator.
@@ -120,7 +119,7 @@
                  * non-infinite) iterator semantics.
                  */
                 reverse: function() {
-                    var array = sloth.wrap(iter).unwrap();
+                    var array = sloth.wrap(iter).force();
                     array.reverse();
                     return sloth.wrap(sloth.iterArray(array));
                 },
