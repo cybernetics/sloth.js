@@ -104,7 +104,7 @@
                  *
                  * This is a strict operation.
                  */
-                force: function(f) {
+                force: function() {
                     var output = [];
                     sloth.wrap(iter).each(function(x) {
                         output.push(x);
