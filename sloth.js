@@ -423,6 +423,31 @@
                     });
                 },
 
+                // `cycle` loops a list around itself infinitely.
+                //
+                // This is a lazy, composable operation.
+                cycle: function() {
+                    var xs = [];
+                    var xsIter = null;
+
+                    return sloth.wrapIter(function() {
+                        var value;
+
+                        try {
+                            value = (xsIter === null ? iter : xsIter)();
+                        } catch(e) {
+                            if(e === sloth.StopIteration) {
+                                xsIter = sloth.iterArray(xs);
+                                return xsIter();
+                            }
+                            throw e;
+                        }
+
+                        if(xsIter === null) xs.push(value);
+                        return value;
+                    });
+                },
+
                 // `nub` removes duplicate elements from the sequence using
                 // the given predicate for comparison.
                 //

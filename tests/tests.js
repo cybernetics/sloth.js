@@ -454,6 +454,16 @@
             test.done();
         },
 
+        testCycle: function(test) {
+            test.expect(4);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 2])).cycle().next;
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.done();
+        },
+
         testConcat: function(test) {
             test.expect(5);
             var iter = sloth.wrapIter(sloth.iterArray([1, 2])).concat(sloth.iterArray([3, 4])).next;
