@@ -538,8 +538,12 @@
                 // This is a strict, composable operation.
                 reverse: function() {
                     var array = sloth.wrapIter(iter).force();
-                    array.reverse();
-                    return sloth.wrapIter(sloth.iterArray(array));
+                    var n = array.length;
+
+                    return sloth.wrapIter(function() {
+                        if(n == 0) throw sloth.StopIteration;
+                        return array[--n];
+                    });
                 },
 
                 // `sort` sorts the sequence using a comparison function.
