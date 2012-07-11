@@ -397,8 +397,8 @@
 
                 // `concat` joins two sequences to each other, end-to-end. Note
                 // that the `ys` parameter must be an actual iterator and not a
-                // `sloth.wrapIter`ped iterator (this can be taken from any
-                // `sloth.wrapIter`ped iterator with `wrapped.next`).
+                // `sloth.wrapIter`ed iterator (this can be taken from any
+                // `sloth.wrapIter`ed iterator with `wrapped.next`).
                 //
                 // This will completely drain the `ys` iterator.
                 //
@@ -558,7 +558,7 @@
         },
 
         // Create an iterator for an array. Note that this is the low-level
-        // iterator and needs to be `sloth.wrapIter`ped for useful things.
+        // iterator and needs to be `sloth.wrapIter`ed for useful things.
         iterArray: function(array) {
             var i = 0;
 
@@ -569,7 +569,7 @@
         },
 
         // Create an iterator for a string.  Note that this is the low-level
-        // iterator and needs to be `sloth.wrapIter`ped for useful things.
+        // iterator and needs to be `sloth.wrapIter`ed for useful things.
         iterString: function(string) {
             var i = 0;
 
@@ -601,7 +601,7 @@
         // influenced by Python's `range` function.
         //
         // Also note that this is the low-level iterator and needs to be
-        // `sloth.wrapIter`ped for useful things.
+        // `sloth.wrapIter`ed for useful things.
         iterRange: function(a, b, step) {
             if(arguments.length == 1) {
                 b = a;
