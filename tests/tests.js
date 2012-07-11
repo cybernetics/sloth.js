@@ -526,12 +526,14 @@
 
         testZip: function(test) {
             test.expect(5);
-            var iter = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).zip(sloth.iterArray([1, 2, 3, 4, 5])).next;
+            var iter = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4]))
+                .zip(sloth.iterArray([1, 2, 3, 4, 5]), sloth.iterArray([2, 3, 4, 5, 6]))
+                .next;
 
-            test.deepEqual([1, 1], iter());
-            test.deepEqual([2, 2], iter());
-            test.deepEqual([3, 3], iter());
-            test.deepEqual([4, 4], iter());
+            test.deepEqual([1, 1, 2], iter());
+            test.deepEqual([2, 2, 3], iter());
+            test.deepEqual([3, 3, 4], iter());
+            test.deepEqual([4, 4, 5], iter());
             try {
                 iter()
             } catch(e) {
