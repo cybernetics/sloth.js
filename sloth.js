@@ -1,6 +1,8 @@
 (function() {
     "use strict";
 
+    // _The lazy JavaScript iterator library._
+    //
     // `sloth.js` is a JavaScript library for working with lazy iterators,
     // providing a way to create, compose and perform various other operations
     // on them --- forming a composable algebra of operations on iterators.
@@ -8,7 +10,9 @@
     // `sloth.js` will be slower than conventional operations for short
     // operations, but where it shines is consuming large amounts of data
     // along a pipeline, e.g. combining `map`, `filter` and `foldl` operations.
-    // This is because it doesn't allocate any space before actual iteration.
+    // This is because it doesn't allocate any space before actual iteration
+    // (however, for some inexplicable reason, it sometimes runs faster than
+    // native code).
     //
     // Inspired by Python's `itertools` module, Haskell's lazy list facilities
     // and Jeremy Ashkenas's Underscore.js.
