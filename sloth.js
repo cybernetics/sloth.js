@@ -1,12 +1,15 @@
 (function() {
     "use strict";
 
-    // sloth.js is a JavaScript library for working with lazy iterators,
+    // `sloth.js` is a JavaScript library for working with lazy iterators,
     // providing a way to create, compose and perform various other operations
     // on them --- forming a composable algebra of operations on iterators.
     //
-    // A lazy iterator in sloth.js is defined as a function (usually a closure)
-    // which can be continually invoked to yield successive values of a
+    // `sloth.js` is inspired by Python's `itertools` module, Haskell's
+    // lazy list facilities and Jeremy Ashkenas's Underscore.js.
+    //
+    // A lazy iterator in `sloth.js` is defined as a function (usually a
+    // closure) which can be repeatedly invoked to yield successive values of a
     // sequence, until the appropriate exception, `sloth.StopIteration`, is
     // thrown to indicate the end of the sequence.
     var sloth = {
