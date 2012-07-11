@@ -22,6 +22,8 @@
         // ## Slothification
         //
         // `sloth.ify` a sequence, making it usable with `sloth.js` operations.
+        // Slothification is an idempotent operation, meaning it can be used
+        // on a slothified variable multiple times without any issue.
         //
         // ### Terminology
         //
@@ -47,6 +49,7 @@
         // Non-composable operations are found at the end of a `sloth.ify`ed
         // chain, usually culminating in a result.
         ify: function(xs) {
+            if(xs.slothified) return xs;
             return sloth.wrapIter(sloth.iterify(xs));
         },
 
@@ -59,6 +62,9 @@
         // invoking `wrapIter` on it will result in breakage.
         wrapIter: function(iter) {
             var _wrapped = {
+                // Mark the object as a `sloth.ify`ed.
+                slothified: true,
+
                 // ## Maps, filters and folds
 
                 // `map` applies a function across all elements of a sequence.
@@ -254,10 +260,9 @@
                 // `union` yields a sequence with only the unique elements from
                 // both sequences, using the given predicate for comparison.
                 //
-                // Similarly to `concat`, `ys` must be an iterator. This will
-                // completely drain the `ys` iterator.
+                // This will drain the `ys` iterator.
                 //
-                // Again, this can be slow due to the use of `nub`.
+                // This can be slow due to the use of `nub`.
                 //
                 // This is a lazy, composable operation.
                 union: function(ys, f) {
@@ -272,8 +277,7 @@
                 // present in both sequences, using the given predicate for
                 // comparison.
                 //
-                // Similarly to `concat`, `ys` must be an iterator. This will
-                // completely drain the `ys` iterator.
+                // This will drain the `ys` iterator.
                 //
                 // Yet again, this can be slow due to the use of `nub`.
                 //
@@ -283,7 +287,7 @@
                     if(typeof f === "undefined") f = sloth.eq;
 
                     var seen = sloth.wrapIter(iter).nub().force();
-                    var ysNubbed = sloth.wrapIter(ys).nub().next;
+                    var ysNubbed = sloth.ify(ys).nub().next;
 
                     return sloth.wrapIter(function() {
                         var value;
@@ -302,8 +306,7 @@
                 // `difference` yields a sequence with the elements of sequence
                 // B removed from sequence A.
                 //
-                // Similarly to `concat`, `ys` must be an iterator. This will
-                // completely drain the `ys` iterator.
+                // This will drain the `ys` iterator.
                 //
                 // This does not return only unique elements, but the resulting
                 // sequence can be `nub()`ed.
@@ -313,7 +316,7 @@
                 difference: function(ys, f) {
                     if(typeof f === "undefined") f = sloth.eq;
 
-                    var seen = sloth.wrapIter(ys).nub().force();
+                    var seen = sloth.ify(ys).nub().force();
 
                     return sloth.wrapIter(function() {
                         var value;
@@ -338,8 +341,7 @@
                 // `symmetricDifference` yields a sequence of the elements
                 // present in neither sequence.
                 //
-                // Similarly to `concat`, `ys` must be an iterator. This will
-                // completely drain the `ys` iterator.
+                // This will drain the `ys` iterator.
                 //
                 // This does not return only unique elements, but the resulting
                 // sequence can be `nub()`ed.
@@ -349,7 +351,7 @@
                     if(typeof f === "undefined") f = sloth.eq;
 
                     var xsArray = sloth.wrapIter(iter).force().reverse();
-                    var ysArray = sloth.wrapIter(ys).force().reverse();
+                    var ysArray = sloth.ify(ys).force().reverse();
 
                     var seen = sloth.wrapIter(sloth.iterArray(xsArray))
                         .intersect(sloth.iterArray(ysArray), f)
@@ -406,16 +408,14 @@
                     }
                 },
 
-                // `concat` joins two sequences to each other, end-to-end. Note
-                // that the `ys` parameter must be an actual iterator and not a
-                // `sloth.wrapIter`ed iterator (this can be taken from any
-                // `sloth.wrapIter`ed iterator with `wrapped.next`).
+                // `concat` joins two sequences to each other, end-to-end.
                 //
-                // This will completely drain the `ys` iterator.
+                // This will drain the `ys` iterator.
                 //
                 // This is a lazy, composable operation.
                 concat: function(ys) {
                     var xsEnd = false;
+                    var ysIter = sloth.ify(ys).next;
 
                     return sloth.wrapIter(function() {
                         if(!xsEnd) {
@@ -424,11 +424,11 @@
                             } catch(e) {
                                 if(e !== sloth.StopIteration) throw e;
                                 xsEnd = true;
-                                return ys();
+                                return ysIter();
                             }
                         }
 
-                        if(xsEnd) return ys();
+                        if(xsEnd) return ysIter();
                     });
                 },
 
@@ -445,7 +445,7 @@
                     var i;
 
                     for(i = 0; i < arrays.length; ++i) {
-                        arrays[i] = sloth.wrapIter(arrays[i]).force();
+                        arrays[i] = sloth.ify(arrays[i]).force();
                     }
 
                     // The following code is downrigt disgusting, so
@@ -596,6 +596,11 @@
                 zip: function() {
                     var iters = Array.prototype.slice.call(arguments);
                     iters.unshift(iter);
+                    var i;
+
+                    for(i = 0; i < iters.length; ++i) {
+                        iters[i] = sloth.ify(iters[i]).next;
+                    }
 
                     return sloth.wrapIter(function() {
                         var i;
@@ -647,13 +652,20 @@
         // ## Iterators
         //
         // A lazy iterator in `sloth.js` is defined as a function (usually a
-        // closure) which can be repeatedly invoked to yield successive values of a
-        // sequence, until the appropriate exception, `sloth.StopIteration`, is
-        // thrown to indicate the end of the sequence.
+        // closure) which can be repeatedly invoked to yield successive values
+        // of a sequence, until the appropriate exception,
+        // `sloth.StopIteration`, is thrown to indicate the end of the
+        // sequence.
 
         // `iterify` creates an low-level iterator for various common data
         // types.
         iterify: function(xs) {
+            // Check if the object is a function (and therefore can be used as
+            // an iterator).
+            if(xs && xs.constructor && xs.call && xs.apply) {
+                return xs;
+            }
+
             // Check if the object is a generator (JavaScript 1.7 only).
             if(typeof xs.next !== "undefined") {
                 return sloth.iterGenerator(xs);
