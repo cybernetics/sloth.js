@@ -360,5 +360,11 @@
         }
     };
 
-    module.exports = sloth;
+    // Export `sloth.js` appropriately for Node.js and the browser.
+    if(typeof module !== "undefined" && module.exports) {
+        module.exports = sloth;
+    }
+    if(typeof window !== "undefined") {
+        window.sloth = sloth;
+    }
 })();
