@@ -708,7 +708,7 @@
                 test.strictEqual(sloth.StopIteration, e);
             }
             test.done();
-        },
+        }
     };
 
     var sloth;
