@@ -30,6 +30,21 @@
             test.done();
         },
 
+        testIterObject: function(test) {
+            test.expect(5);
+            var iter = sloth.iterObject({a: 1, b: 2, c: 3, d: 4});
+            test.deepEqual(["a", 1], iter());
+            test.deepEqual(["b", 2], iter());
+            test.deepEqual(["c", 3], iter());
+            test.deepEqual(["d", 4], iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
         testIterGenerator: function(test) {
             if(typeof StopIteration === "undefined") {
                 test.expect(1);
@@ -84,6 +99,21 @@
             test.strictEqual("e", iter());
             test.strictEqual("s", iter());
             test.strictEqual("t", iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testIfyObject: function(test) {
+            test.expect(5);
+            var iter = sloth.ify({a: 1, b: 2, c: 3, d: 4}).next;
+            test.deepEqual(["a", 1], iter());
+            test.deepEqual(["b", 2], iter());
+            test.deepEqual(["c", 3], iter());
+            test.deepEqual(["d", 4], iter());
             try {
                 iter();
             } catch(e) {

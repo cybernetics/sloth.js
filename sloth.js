@@ -160,15 +160,13 @@
                 // `max` returns the maximum value of the sequence using a
                 // given comparison function.
                 //
+                // If you're looking for the maximum of an array, it is much
+                // more efficient to use `Math.max.apply(Math, array)` (up to
+                // 40x(!!) faster).
+                //
                 // This is a strict, non-composable operation.
                 max: function(f) {
-                    // If we aren't given a comparison function, we can cheat
-                    // and use `Math.max.apply` --- the semantics of the
-                    // comparator used are the same.
-                    if(typeof f === "undefined") {
-                        return Math.max.apply(Math,
-                                              sloth.wrapIter(iter).force());
-                    }
+                    if(typeof f === "undefined") f = sloth.cmp;
 
                     return sloth.wrapIter(iter).foldl(function(acc, x) {
                         return f(acc, x) > 0 ? acc : x;
@@ -178,14 +176,13 @@
                 // `min` returns the minimum value of the sequence using a
                 // given comparison function.
                 //
+                // If you're looking for the minimum of an array, it is much
+                // more efficient to use `Math.min.apply(Math, array)` (up to
+                // 40x(!!) faster).
+                //
                 // This is a strict, non-composable operation.
                 min: function(f) {
-                    // Likewise, if we aren't given a comparison function, we
-                    // can cheat and use `Math.min.apply`.
-                    if(typeof f === "undefined") {
-                        return Math.min.apply(Math,
-                                              sloth.wrapIter(iter).force());
-                    }
+                    if(typeof f === "undefined") f = sloth.cmp;
 
                     return sloth.wrapIter(iter).foldl(function(acc, x) {
                         return f(acc, x) < 0 ? acc : x;
@@ -634,7 +631,7 @@
                 return sloth.iterArray(xs);
             }
 
-            throw new TypeError("cannot iterify object");
+            return sloth.iterObject(xs);
         },
 
         // Create an iterator for an array. Note that this is the low-level
@@ -657,6 +654,19 @@
                 if(i >= string.length) throw sloth.StopIteration;
                 return string.charAt(i++);
             };
+        },
+
+        // Create an iterator for an object which yields pairs of keys and
+        // values. This will immediately read in the object and generate a
+        // list of its keys and values and, as such, won't reflect any changes
+        // to the object.
+        iterObject: function(obj) {
+            var items = [];
+            for(var k in obj) {
+                if(!Object.prototype.hasOwnProperty.call(obj, k)) continue;
+                items.push([k, obj[k]]);
+            }
+            return sloth.iterArray(items);
         },
 
         // Create an iterator for a generator (JavaScript 1.7 only).

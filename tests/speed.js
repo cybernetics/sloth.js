@@ -96,12 +96,14 @@
             .force();
     });
 
-    JSLitmus.test('underscore.max()', function() {
-        return _.max(randoms);
+    JSLitmus.test('underscore.map().max()', function() {
+        return _.max(_.map(randoms, function(x) { return x + 1; }));
     });
 
-    JSLitmus.test('sloth.ify().max()', function() {
-        return sloth.ify(randoms).max();
+    JSLitmus.test('sloth.ify().map().max()', function() {
+        return sloth.ify(randoms)
+            .map(function(x) { return x + 1; })
+            .max();
     });
 
     JSLitmus.test('underscore.map().filter().reduce()', function() {
