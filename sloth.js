@@ -311,7 +311,8 @@
                         var skip;
                         var i;
 
-                        while(value = iter()) {
+                        for(;;) {
+                            value = iter()
                             skip = false;
 
                             for(i = 0; i < seen.length; ++i) {
@@ -464,7 +465,8 @@
                         var skip;
                         var i;
 
-                        while(value = iter()) {
+                        for(;;) {
+                            value = iter();
                             skip = false;
                             for(i = 0; i < seen.length; ++i) {
                                 if(f(seen[i], value)) skip = true;

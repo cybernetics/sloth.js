@@ -480,8 +480,9 @@
         },
 
         testNub: function(test) {
-            test.expect(5);
-            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4])).nub().next;
+            test.expect(6);
+            var iter = sloth.wrapIter(sloth.iterArray([0, 1, 1, 2, 3, 4, 4, 4])).nub().next;
+            test.strictEqual(0, iter());
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
             test.strictEqual(3, iter());
@@ -575,10 +576,11 @@
         },
 
         testDifference: function(test) {
-            test.expect(4);
-            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4]))
+            test.expect(5);
+            var iter = sloth.wrapIter(sloth.iterArray([0, 1, 1, 2, 3, 4, 4, 4]))
                 .difference(sloth.iterArray([3, 3, 4, 5, 6, 7, 7]))
                 .next;
+            test.strictEqual(0, iter());
             test.strictEqual(1, iter());
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
