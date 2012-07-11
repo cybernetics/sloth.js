@@ -692,14 +692,14 @@
         // iterator has no more data left to yield, i.e. an end-of-stream
         // situation.
         //
+        // A common example of this reaching the end of an array in a
+        // traditional `for` loop.
+        //
         // Some JavaScript engines (presently SpiderMonkey) support
         // `StopIteration` exceptions.
         //
         // `StopIteration` instances must _not_ be instantiated --- it is a
         // singleton exception object which is designed to be thrown as is.
-        //
-        // A common example of this reaching the end of an array in a
-        // traditional `for` loop.
         StopIteration: typeof StopIteration !== "undefined" ?
                        StopIteration :
                        {},
