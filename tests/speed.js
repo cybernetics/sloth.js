@@ -9,6 +9,11 @@
         randoms.push(Math.floor(Math.random() * i * RANDOM_MAX));
     }
 
+    var randoms2 = []; var RANDOM_MAX = 500;
+    for(var i = 0; i < 1000; i++) {
+        randoms2.push(Math.floor(Math.random() * i * RANDOM_MAX));
+    }
+
     JSLitmus.test('underscore.each()', function() {
         var output = [];
         _.each(numbers, function(x) {
@@ -59,6 +64,44 @@
         return sloth.ify(randoms)
             .nub()
             .force();
+    });
+
+    JSLitmus.test('underscore.intersection()', function() {
+        return _.intersection(randoms, randoms2);
+    });
+
+    JSLitmus.test('sloth.ify().intersect()', function() {
+        return sloth.ify(randoms)
+            .intersect(sloth.ify(randoms2).next)
+            .force();
+    });
+
+    JSLitmus.test('underscore.union()', function() {
+        return _.union(randoms, randoms2);
+    });
+
+    JSLitmus.test('sloth.ify().union()', function() {
+        return sloth.ify(randoms)
+            .union(sloth.ify(randoms2).next)
+            .force();
+    });
+
+    JSLitmus.test('underscore.zip()', function() {
+        return _.zip(randoms, randoms2);
+    });
+
+    JSLitmus.test('sloth.ify().zip()', function() {
+        return sloth.ify(randoms)
+            .zip(sloth.ify(randoms2).next)
+            .force();
+    });
+
+    JSLitmus.test('underscore.max()', function() {
+        return _.max(randoms);
+    });
+
+    JSLitmus.test('sloth.ify().max()', function() {
+        return sloth.ify(randoms).max();
     });
 
     JSLitmus.test('underscore.map().filter().reduce()', function() {

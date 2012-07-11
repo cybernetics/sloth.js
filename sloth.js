@@ -162,19 +162,30 @@
                 //
                 // This is a strict, non-composable operation.
                 max: function(f) {
-                    if(typeof f === "undefined") f = sloth.cmp;
+                    // If we aren't given a comparison function, we can cheat
+                    // and use `Math.max.apply` --- the semantics of the
+                    // comparator used are the same.
+                    if(typeof f === "undefined") {
+                        return Math.max.apply(Math,
+                                              sloth.wrapIter(iter).force());
+                    }
 
                     return sloth.wrapIter(iter).foldl(function(acc, x) {
                         return f(acc, x) > 0 ? acc : x;
                     });
                 },
 
-                // `max` returns the maximum value of the sequence using a
+                // `min` returns the minimum value of the sequence using a
                 // given comparison function.
                 //
                 // This is a strict, non-composable operation.
                 min: function(f) {
-                    if(typeof f === "undefined") f = sloth.cmp;
+                    // Likewise, if we aren't given a comparison function, we
+                    // can cheat and use `Math.min.apply`.
+                    if(typeof f === "undefined") {
+                        return Math.min.apply(Math,
+                                              sloth.wrapIter(iter).force());
+                    }
 
                     return sloth.wrapIter(iter).foldl(function(acc, x) {
                         return f(acc, x) < 0 ? acc : x;
