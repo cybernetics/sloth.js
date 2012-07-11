@@ -58,8 +58,7 @@
         // This function is _not_ idempotent! If `iter` is already wrapped,
         // invoking `wrapIter` on it will result in breakage.
         wrapIter: function(iter) {
-            var _wrapped;
-            return _wrapped = {
+            var _wrapped = {
                 // ## Maps, filters and folds
 
                 // `map` applies a function across all elements of a sequence.
@@ -190,7 +189,7 @@
                 // This is a lazy, composable operation.
                 take: function(n) {
                     return sloth.wrapIter(function() {
-                        if(n == 0) throw sloth.StopIteration;
+                        if(n === 0) throw sloth.StopIteration;
                         n--;
                         return iter();
                     });
@@ -258,7 +257,7 @@
 
                     return sloth.wrapIter(iter)
                         .concat(ys)
-                        .nub(f)
+                        .nub(f);
                 },
 
                 // `intersect` yields a sequence with only the unique elements
@@ -282,7 +281,9 @@
                         var value;
                         var i;
 
-                        while(value = ysNubbed()) {
+                        for(;;) {
+                            value = ysNubbed();
+
                             for(i = 0; i < seen.length; ++i) {
                                 if(f(seen[i], value)) return value;
                             }
@@ -312,7 +313,7 @@
                         var i;
 
                         for(;;) {
-                            value = iter()
+                            value = iter();
                             skip = false;
 
                             for(i = 0; i < seen.length; ++i) {
@@ -596,7 +597,9 @@
                 __iterator__: function() {
                     return _wrapped;
                 }
-            }
+            };
+
+            return _wrapped;
         },
 
         // ## Iterators
@@ -721,7 +724,7 @@
         // two values.
         eq: function(a, b) {
             return a === b;
-        },
+        }
     };
 
     // ## Finale

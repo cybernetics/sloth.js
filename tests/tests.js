@@ -611,11 +611,11 @@
 
         testIntersect: function(test) {
             test.expect(3);
-            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4]))
-                .intersect(sloth.iterArray([3, 3, 4, 5, 6, 7, 7]))
+            var iter = sloth.wrapIter(sloth.iterArray([0, 1, 1, 2, 3, 4, 4, 4]))
+                .intersect(sloth.iterArray([0, 3, 3, 5, 6, 7, 7]))
                 .next;
+            test.strictEqual(0, iter());
             test.strictEqual(3, iter());
-            test.strictEqual(4, iter());
             try {
                 iter();
             } catch(e) {
