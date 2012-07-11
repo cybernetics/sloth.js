@@ -448,7 +448,7 @@
                         arrays[i] = sloth.ify(arrays[i]).force();
                     }
 
-                    // The following code is downrigt disgusting, so
+                    // The following code is downright disgusting, so
                     // annotations will be provided in the form of Haskell
                     // code.
                     //
