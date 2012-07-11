@@ -153,9 +153,15 @@
                 // This is a strict, non-composable operation.
                 force: function() {
                     var output = [];
-                    sloth.wrapIter(iter).each(function(x) {
-                        output.push(x);
-                    });
+                    for(;;) {
+                        try {
+                            var value = iter();
+                        } catch(e) {
+                            if(e === sloth.StopIteration) break;
+                            throw e;
+                        }
+                        output.push(value);
+                    }
                     return output;
                 },
 
@@ -184,15 +190,6 @@
                 //
                 // This is a strict, non-composable operation.
                 foldl: function(f, acc) {
-                    if(Array.prototype.reduce) {
-                        // We can delegate to the native
-                        // `Array.prototype.reduce`, if it's supported.
-                        var array = sloth.wrapIter(iter).force();
-                        return arguments.length == 1 ?
-                               Array.prototype.reduce.call(array, f) :
-                               Array.prototype.reduce.call(array, f, acc);
-                    }
-
                     if(arguments.length == 1) acc = iter();
 
                     sloth.wrapIter(iter).each(function(x) {
@@ -206,15 +203,6 @@
                 //
                 // This is a strict, non-composable operation.
                 foldr: function(f, acc) {
-                    // We can delegate to the native
-                    // `Array.prototype.reduceRight`, if it's supported.
-                    if(Array.prototype.reduceRight) {
-                        var array = sloth.wrapIter(iter).force();
-                        return arguments.length == 1 ?
-                               Array.prototype.reduceRight.call(array, f) :
-                               Array.prototype.reduceRight.call(array, f, acc);
-                    }
-
                     var reverseIter = sloth.wrapIter(iter).reverse().next;
 
                     if(arguments.length == 1) acc = reverseIter();

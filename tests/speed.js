@@ -20,6 +20,32 @@
         return output;
     });
 
+    JSLitmus.test('underscore.reduce()', function() {
+        return _.reduce(numbers, function(acc, x) {
+            return acc + x;
+        }, 10);
+    });
+
+    JSLitmus.test('sloth.ify().foldl()', function() {
+        return sloth.ify(numbers)
+            .foldl(function(acc, x) {
+                return acc + x;
+            }, 10);
+    });
+
+    JSLitmus.test('underscore.reduceRight()', function() {
+        return _.reduceRight(numbers, function(acc, x) {
+            return acc + x;
+        }, 10);
+    });
+
+    JSLitmus.test('sloth.ify().foldr()', function() {
+        return sloth.ify(numbers)
+            .foldr(function(acc, x) {
+                return acc + x;
+            }, 10);
+    });
+
     JSLitmus.test('underscore.map().filter()', function() {
         return _.filter(_.map(numbers, function(x) {
             return x + 1;
