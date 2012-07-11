@@ -1,0 +1,15 @@
+{
+    "name": "sloth",
+    "version": "0.0.1",
+    "author": "Tony Young <tony@rfw.name>",
+    "description": "A lazy iterator framework for JavaScript.",
+    "main": "./sloth",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rfw/sloth.js.git"
+    },
+    "devDependencies": {
+        "nodeunit": "0.7.x"
+    },
+    "license": "MIT"
+}

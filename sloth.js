@@ -8,6 +8,8 @@
     // `sloth.js` is inspired by Python's `itertools` module, Haskell's
     // lazy list facilities and Jeremy Ashkenas's Underscore.js.
     //
+    // `sloth.js` is freely distributable under the terms of the MIT license.
+    //
     // A lazy iterator in `sloth.js` is defined as a function (usually a
     // closure) which can be repeatedly invoked to yield successive values of a
     // sequence, until the appropriate exception, `sloth.StopIteration`, is
@@ -17,9 +19,14 @@
         // iterator has no more data left to yield, i.e. an end-of-stream
         // situation.
         //
+        // Some JavaScript engines (presently SpiderMonkey) support
+        // StopIteration exceptions.
+        //
         // A common example of this reaching the end of an array in a
         // traditional `for` loop.
-        StopIteration: {},
+        StopIteration: typeof StopIteration !== "undefined" ?
+                       StopIteration :
+                       {},
 
         // A function where, given a value, returns the value (a la Haskell).
         id: function(x) {
@@ -53,6 +60,13 @@
             return function() {
                 if(i >= string.length) throw sloth.StopIteration;
                 return string.charAt(i++);
+            };
+        },
+
+        // Create an iterator for a generator (JavaScript 1.7 only).
+        iterGenerator: function(generator) {
+            return function() {
+                return generator.next();
             };
         },
 
