@@ -235,6 +235,21 @@
             test.done();
         },
 
+        testEnumerate: function(test) {
+            test.expect(5);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).enumerate().next;
+            test.deepEqual([0, 1], iter());
+            test.deepEqual([1, 2], iter());
+            test.deepEqual([2, 3], iter());
+            test.deepEqual([3, 4], iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
         testReverse: function(test) {
             test.expect(5);
             var iter = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).reverse().next;
@@ -705,3 +720,4 @@
         window.tests = tests;
     }
 })()
+

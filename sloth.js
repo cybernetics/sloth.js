@@ -479,6 +479,17 @@
                     });
                 },
 
+                // `enumerate` takes each element and places it in an array
+                // with the index as the first element.
+                //
+                // This is a lazy, composable operaton.
+                enumerate: function() {
+                    var i = 0;
+                    return sloth.wrapIter(function() {
+                        return [i++, iter()];
+                    });
+                },
+
                 // `reverse` reverses the sequence.
                 //
                 // This is a strict, composable operation.
