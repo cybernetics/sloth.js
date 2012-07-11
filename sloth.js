@@ -432,6 +432,44 @@
                     });
                 },
 
+                // `product` yields the Cartesian product of a series of
+                // sequences.
+                //
+                // This will completely drain all iterators.
+                //
+                // This is a strict, composable operation (until someone
+                // figures out a lazy version).
+                product: function() {
+                    var arrays = Array.prototype.slice.call(arguments);
+                    arrays.unshift(iter);
+                    var i;
+
+                    for(i = 0; i < arrays.length; ++i) {
+                        arrays[i] = sloth.wrapIter(arrays[i]).force();
+                    }
+
+                    // The following code is downrigt disgusting, so
+                    // annotations will be provided in the form of Haskell
+                    // code.
+                    //
+                    //     product = foldl f [[]] arrays
+                    return sloth.wrapIter(sloth.iterArray(sloth.wrapIter(sloth.iterArray(arrays)).foldl(function(accs, xs) {
+                        //         where f accs xs = foldl g [] xs
+                        return sloth.wrapIter(sloth.iterArray(xs)).foldl(function(acc, x) {
+                            //               g acc x = acc ++ (zs x)
+                            return sloth.wrapIter(sloth.iterArray(acc)).concat(
+                                //               zs x = map (h x) accs
+                                sloth.iterArray(sloth.wrapIter(sloth.iterArray(accs)).map(function(ys) {
+                                    //               h x ys = concat ys ++ [x]
+                                    return sloth.wrapIter(sloth.iterArray(ys))
+                                        .concat(sloth.iterArray([x]))
+                                        .force();
+                                }).force())
+                            ).force();
+                        }, []);
+                    }, [[]])));
+                },
+
                 // `cycle` loops a list around itself infinitely.
                 //
                 // This is a lazy, composable operation.

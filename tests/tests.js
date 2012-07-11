@@ -525,6 +525,22 @@
             test.done();
         },
 
+        testProduct: function(test) {
+            test.expect(5);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 2])).product(sloth.iterArray([3, 4])).next;
+            test.deepEqual([1, 3], iter());
+            test.deepEqual([2, 3], iter());
+            test.deepEqual([1, 4], iter());
+            test.deepEqual([2, 4], iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+
         testTee: function(test) {
             test.expect(10);
             var iters = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).tee();
