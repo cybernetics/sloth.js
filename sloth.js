@@ -127,8 +127,8 @@
                         try {
                             value = iter();
                         } catch(e) {
-                            if(e === sloth.StopIteration) break;
-                            throw e;
+                            if(e !== sloth.StopIteration) throw e;
+                            break;
                         }
                         if(!f(value)) return false;
                     }
@@ -147,8 +147,8 @@
                         try {
                             value = iter();
                         } catch(e) {
-                            if(e === sloth.StopIteration) break;
-                            throw e;
+                            if(e !== sloth.StopIteration) throw e;
+                            break;
                         }
                         if(f(value)) return true;
                     }
@@ -391,8 +391,8 @@
                         try {
                             value = iter();
                         } catch(e) {
-                            if(e === sloth.StopIteration) break;
-                            throw e;
+                            if(e !== sloth.StopIteration) throw e;
+                            break;
                         }
                         f(value, i++);
                     }
@@ -414,11 +414,9 @@
                             try {
                                 return iter();
                             } catch(e) {
-                                if(e === sloth.StopIteration) {
-                                    xsEnd = true;
-                                    return ys();
-                                }
-                                throw e;
+                                if(e !== sloth.StopIteration) throw e;
+                                xsEnd = true;
+                                return ys();
                             }
                         }
 
@@ -439,11 +437,9 @@
                         try {
                             value = (xsIter === null ? iter : xsIter)();
                         } catch(e) {
-                            if(e === sloth.StopIteration) {
-                                xsIter = sloth.iterArray(xs);
-                                return xsIter();
-                            }
-                            throw e;
+                            if(e !== sloth.StopIteration) throw e;
+                            xsIter = sloth.iterArray(xs);
+                            return xsIter();
                         }
 
                         if(xsIter === null) xs.push(value);
@@ -579,8 +575,8 @@
                         try {
                             value = iter();
                         } catch(e) {
-                            if(e === sloth.StopIteration) break;
-                            throw e;
+                            if(e !== sloth.StopIteration) throw e;
+                            break;
                         }
                         output.push(value);
                     }
@@ -698,6 +694,9 @@
         //
         // Some JavaScript engines (presently SpiderMonkey) support
         // `StopIteration` exceptions.
+        //
+        // `StopIteration` instances must _not_ be instantiated --- it is a
+        // singleton exception object which is designed to be thrown as is.
         //
         // A common example of this reaching the end of an array in a
         // traditional `for` loop.
