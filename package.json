@@ -9,7 +9,8 @@
         "url": "https://github.com/rfw/sloth.js.git"
     },
     "devDependencies": {
-        "nodeunit": "0.7.x"
+        "nodeunit": "0.7.x",
+        "docco": "x.x.x"
     },
     "license": "MIT"
 }

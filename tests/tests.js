@@ -468,6 +468,171 @@
             }
             test.done();
         },
+
+        testNub: function(test) {
+            test.expect(5);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4])).nub().next;
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testNubPredicate: function(test) {
+            test.expect(3);
+            var iter = sloth.wrapIter(sloth.iterArray(["cat", "coffee", "dog"])).nub(function(x, y) { return x.charAt(0) == y.charAt(0); }).next;
+            test.strictEqual("cat", iter());
+            test.strictEqual("dog", iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testUnion: function(test) {
+            test.expect(8);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4]))
+                .union(sloth.iterArray([3, 3, 4, 5, 6, 7, 7]))
+                .next;
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            test.strictEqual(5, iter());
+            test.strictEqual(6, iter());
+            test.strictEqual(7, iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testUnionPredicate: function(test) {
+            test.expect(4);
+            var iter = sloth.wrapIter(sloth.iterArray(["cat", "coffee", "dog"]))
+                .union(sloth.iterArray(["dish", "rabbit", "rock"]),
+                       function(x, y) { return x.charAt(0) == y.charAt(0); })
+                .next;
+            test.strictEqual("cat", iter());
+            test.strictEqual("dog", iter());
+            test.strictEqual("rabbit", iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testIntersect: function(test) {
+            test.expect(3);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4]))
+                .intersect(sloth.iterArray([3, 3, 4, 5, 6, 7, 7]))
+                .next;
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testIntersectPredicate: function(test) {
+            test.expect(2);
+            var iter = sloth.wrapIter(sloth.iterArray(["cat", "coffee", "dog"]))
+                .intersect(sloth.iterArray(["dish", "rabbit", "rock"]),
+                           function(x, y) { return x.charAt(0) == y.charAt(0); })
+                .next;
+            test.strictEqual("dish", iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testDifference: function(test) {
+            test.expect(4);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4]))
+                .difference(sloth.iterArray([3, 3, 4, 5, 6, 7, 7]))
+                .next;
+            test.strictEqual(1, iter());
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testDifferencePredicate: function(test) {
+            test.expect(3);
+            var iter = sloth.wrapIter(sloth.iterArray(["cat", "coffee", "dog"]))
+                .difference(sloth.iterArray(["dish", "rabbit", "rock"]),
+                           function(x, y) { return x.charAt(0) == y.charAt(0); })
+                .next;
+            test.strictEqual("cat", iter());
+            test.strictEqual("coffee", iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testSymmetricDifference: function(test) {
+            test.expect(8);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 1, 2, 3, 4, 4, 4]))
+                .symmetricDifference(sloth.iterArray([3, 3, 4, 5, 6, 7, 7]))
+                .next;
+            test.strictEqual(1, iter());
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(5, iter());
+            test.strictEqual(6, iter());
+            test.strictEqual(7, iter());
+            test.strictEqual(7, iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testSymmetricDifferencePredicate: function(test) {
+            test.expect(5);
+            var iter = sloth.wrapIter(sloth.iterArray(["cat", "coffee", "dog"]))
+                .symmetricDifference(sloth.iterArray(["dish", "rabbit", "rock"]),
+                           function(x, y) { return x.charAt(0) == y.charAt(0); })
+                .next;
+            test.strictEqual("cat", iter());
+            test.strictEqual("coffee", iter());
+            test.strictEqual("rabbit", iter());
+            test.strictEqual("rock", iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
     };
 
     var sloth;
