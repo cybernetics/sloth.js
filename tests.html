@@ -2,15 +2,21 @@
   <head>
     <title>sloth.js Test Suite</title>
     <link rel="stylesheet" href="node_modules/nodeunit/share/nodeunit.css" type="text/css" />
-    <script src="node_modules/nodeunit/examples/browser/nodeunit.js" type="text/javascript"></script>
+
     <script src="sloth.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        document.write('<script src="tests.js" type="text/javascript"></' + 'script>');
-    </script>
+
+    <!-- we include underscore.js strictly for benchmarking -->
+    <script src="vendor/underscore.js" type="text/javascript"></script>
+
+    <script src="node_modules/nodeunit/examples/browser/nodeunit.js" type="text/javascript"></script>
+    <script src="vendor/jslitmus.js" type="text/javascript"></script>
+
+    <script src="tests/tests.js" type="text/javascript"></script>
     <script type="text/javascript;version=1.7">
         // enable JavaScript 1.7 features on browsers that support it.
-        document.write('<script src="tests.js" type="text/javascript;version=1.7"></' + 'script>');
+        document.write('<script src="tests/tests.js" type="text/javascript;version=1.7"></' + 'script>');
     </script>
+    <script src="tests/speed.js" type="text/javascript"></script>
   </head>
   <body>
     <h1 id="nodeunit-header">sloth.js Test Suite</h1>
@@ -19,5 +25,6 @@
         'sloth.js': tests
       });
     </script>
+    <h1 id="nodeunit-header">sloth.js Speed Suite</h1>
   </body>
 </html>

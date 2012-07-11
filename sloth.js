@@ -20,7 +20,7 @@
         // situation.
         //
         // Some JavaScript engines (presently SpiderMonkey) support
-        // StopIteration exceptions.
+        // `StopIteration` exceptions.
         //
         // A common example of this reaching the end of an array in a
         // traditional `for` loop.
@@ -42,7 +42,7 @@
         },
 
         // Create an iterator for an array. Note that this is the low-level
-        // iterator and needs to be `sloth.wrap`ped for useful things.
+        // iterator and needs to be `sloth.wrapIter`ped for useful things.
         iterArray: function(array) {
             var i = 0;
 
@@ -53,7 +53,7 @@
         },
 
         // Create an iterator for a string.  Note that this is the low-level
-        // iterator and needs to be `sloth.wrap`ped for useful things.
+        // iterator and needs to be `sloth.wrapIter`ped for useful things.
         iterString: function(string) {
             var i = 0;
 
@@ -85,7 +85,7 @@
         // influenced by Python's `range` function.
         //
         // Also note that this is the low-level iterator and needs to be
-        // `sloth.wrap`ped for useful things.
+        // `sloth.wrapIter`ped for useful things.
         iterRange: function(a, b, step) {
             if(arguments.length == 1) {
                 b = a;
@@ -103,14 +103,14 @@
 
         // Wrap an iterator with various fun utility functions, which can be
         // composed to yield lazy sequences.
-        wrap: function(iter) {
+        wrapIter: function(iter) {
             var _wrapped;
             return _wrapped = {
                 // `map` applies a function across all elements of a sequence.
                 //
                 // This is a lazy, composable operation.
                 map: function(f) {
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         return f(iter());
                     });
                 },
@@ -120,7 +120,7 @@
                 //
                 // This is a lazy, composable operation.
                 filter: function(f) {
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         var value;
                         while(!f(value = iter()));
                         return value;
@@ -153,7 +153,7 @@
                 // This is a strict, non-composable operation.
                 force: function() {
                     var output = [];
-                    sloth.wrap(iter).each(function(x) {
+                    sloth.wrapIter(iter).each(function(x) {
                         output.push(x);
                     });
                     return output;
@@ -163,9 +163,9 @@
                 //
                 // This is a strict, composable operation.
                 reverse: function() {
-                    var array = sloth.wrap(iter).force();
+                    var array = sloth.wrapIter(iter).force();
                     array.reverse();
-                    return sloth.wrap(sloth.iterArray(array));
+                    return sloth.wrapIter(sloth.iterArray(array));
                 },
 
                 // `sort` sorts an array using a comparison function.
@@ -174,9 +174,9 @@
                 sort: function(f) {
                     if(typeof f === "undefined") f = sloth.cmp;
 
-                    var array = sloth.wrap(iter).force();
+                    var array = sloth.wrapIter(iter).force();
                     array.sort(f);
-                    return sloth.wrap(sloth.iterArray(array));
+                    return sloth.wrapIter(sloth.iterArray(array));
                 },
 
                 // `foldl` is an implementation of the left-fold operation,
@@ -187,7 +187,7 @@
                     if(Array.prototype.reduce) {
                         // We can delegate to the native
                         // `Array.prototype.reduce`, if it's supported.
-                        var array = sloth.wrap(iter).force();
+                        var array = sloth.wrapIter(iter).force();
                         return arguments.length == 1 ?
                                Array.prototype.reduce.call(array, f) :
                                Array.prototype.reduce.call(array, f, acc);
@@ -195,7 +195,7 @@
 
                     if(arguments.length == 1) acc = iter();
 
-                    sloth.wrap(iter).each(function(x) {
+                    sloth.wrapIter(iter).each(function(x) {
                         acc = f(acc, x);
                     });
                     return acc;
@@ -209,17 +209,17 @@
                     // We can delegate to the native
                     // `Array.prototype.reduceRight`, if it's supported.
                     if(Array.prototype.reduceRight) {
-                        var array = sloth.wrap(iter).force();
+                        var array = sloth.wrapIter(iter).force();
                         return arguments.length == 1 ?
                                Array.prototype.reduceRight.call(array, f) :
                                Array.prototype.reduceRight.call(array, f, acc);
                     }
 
-                    var reverseIter = sloth.wrap(iter).reverse().next;
+                    var reverseIter = sloth.wrapIter(iter).reverse().next;
 
                     if(arguments.length == 1) acc = reverseIter();
 
-                    sloth.wrap(reverseIter).each(function(x) {
+                    sloth.wrapIter(reverseIter).each(function(x) {
                         acc = f(acc, x);
                     });
                     return acc;
@@ -270,7 +270,7 @@
                 max: function(f) {
                     if(typeof f === "undefined") f = sloth.cmp;
 
-                    return sloth.wrap(iter).foldl(function(acc, x) {
+                    return sloth.wrapIter(iter).foldl(function(acc, x) {
                         return f(acc, x) > 0 ? acc : x;
                     });
                 },
@@ -282,7 +282,7 @@
                 min: function(f) {
                     if(typeof f === "undefined") f = sloth.cmp;
 
-                    return sloth.wrap(iter).foldl(function(acc, x) {
+                    return sloth.wrapIter(iter).foldl(function(acc, x) {
                         return f(acc, x) < 0 ? acc : x;
                     });
                 },
@@ -292,7 +292,7 @@
                 //
                 // This is a lazy, composable operation.
                 take: function(n) {
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         if(n == 0) throw sloth.StopIteration;
                         n--;
                         return iter();
@@ -304,7 +304,7 @@
                 //
                 // This is a lazy, composable operation.
                 skip: function(n) {
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         while(n) {
                             iter();
                             n--;
@@ -320,7 +320,7 @@
                 takeWhile: function(f) {
                     var ended = false;
 
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         var value = iter();
                         ended = !f(value);
                         if(ended) throw sloth.StopIteration;
@@ -338,7 +338,7 @@
 
                     var firstTaken = false;
 
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         if(firstTaken) return iter();
                         firstTaken = true;
                         return value;
@@ -347,14 +347,14 @@
 
                 // `concat` joins two sequences to each other, end-to-end. Note
                 // that the `ys` parameter must be an actual iterator and not a
-                // `sloth.wrap`ped iterator (this can be taken from any
-                // `sloth.wrap`ped iterator with `wrapped.next`).
+                // `sloth.wrapIter`ped iterator (this can be taken from any
+                // `sloth.wrapIter`ped iterator with `wrapped.next`).
                 //
                 // This is as lazy, composable operation.
                 concat: function(ys) {
                     var xsEnd = false;
 
-                    return sloth.wrap(function() {
+                    return sloth.wrapIter(function() {
                         if(xsEnd) return ys();
                         try {
                             return iter();
@@ -369,8 +369,40 @@
                 },
 
                 // `next` holds the raw iterator function.
-                next: iter
+                next: iter,
+
+                // `__iterator__` implements the iterator protocol for
+                // JavaScript 1.7.
+                __iterator__: function() {
+                    return _wrapped;
+                }
             }
+        },
+
+        // `iterify` creates an low-level iterator for various common data
+        // types.
+        iterify: function(xs) {
+            // Check if the object is a generator (JavaScript 1.7 only).
+            if(typeof xs.next !== "undefined") {
+                return sloth.iterGenerator(xs);
+            }
+
+            // Check if the object is a `String`.
+            if(typeof xs.substring !== "undefined") {
+                return sloth.iterString(xs);
+            }
+
+            // Check if the object is an `Array`.
+            if(Object.prototype.toString.call(xs) === "[object Array]") {
+                return sloth.iterArray(xs);
+            }
+
+            throw new TypeError("cannot iterify object");
+        },
+
+        // `sloth.ify` a sequence, making it usable with `sloth.js` operations.
+        ify: function(xs) {
+            return sloth.wrapIter(sloth.iterify(xs));
         }
     };
 
