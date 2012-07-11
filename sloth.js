@@ -460,7 +460,7 @@
                             return sloth.wrapIter(sloth.iterArray(acc)).concat(
                                 //               zs x = map (h x) accs
                                 sloth.iterArray(sloth.wrapIter(sloth.iterArray(accs)).map(function(ys) {
-                                    //               h x ys = concat ys ++ [x]
+                                    //               h x ys = ys ++ [x]
                                     return sloth.wrapIter(sloth.iterArray(ys))
                                         .concat(sloth.iterArray([x]))
                                         .force();
