@@ -220,9 +220,10 @@
         },
 
         testEach: function(test) {
-            test.expect(4);
+            test.expect(8);
             var i = 0;
-            sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).each(function(x) {
+            sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).each(function(x, j) {
+                test.strictEqual(i, j);
                 test.strictEqual(++i, x);
             });
             test.done();
@@ -476,6 +477,52 @@
             } catch(e) {
                 test.strictEqual(sloth.StopIteration, e);
             }
+            test.done();
+        },
+
+        testTee: function(test) {
+            test.expect(10);
+            var iters = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).tee();
+
+            var iter = iters[0];
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter()
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+
+            var iter = iters[1];
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter()
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+
+            test.done();
+        },
+
+        testZip: function(test) {
+            test.expect(5);
+            var iter = sloth.wrapIter(sloth.iterArray([1, 2, 3, 4])).zip(sloth.iterArray([1, 2, 3, 4, 5])).next;
+
+            test.deepEqual([1, 1], iter());
+            test.deepEqual([2, 2], iter());
+            test.deepEqual([3, 3], iter());
+            test.deepEqual([4, 4], iter());
+            try {
+                iter()
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+
             test.done();
         },
 

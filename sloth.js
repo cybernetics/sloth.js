@@ -384,6 +384,7 @@
                 // This is a strict, non-composable operation.
                 each: function(f) {
                     var value;
+                    var i = 0;
 
                     for(;;) {
                         try {
@@ -392,7 +393,7 @@
                             if(e === sloth.StopIteration) break;
                             throw e;
                         }
-                        f(value);
+                        f(value, i++);
                     }
                 },
 
@@ -478,7 +479,7 @@
                     });
                 },
 
-                // `reverse` reverses the underlying iterator.
+                // `reverse` reverses the sequence.
                 //
                 // This is a strict, composable operation.
                 reverse: function() {
@@ -487,7 +488,7 @@
                     return sloth.wrapIter(sloth.iterArray(array));
                 },
 
-                // `sort` sorts an array using a comparison function.
+                // `sort` sorts the sequence using a comparison function.
                 //
                 // This is a strict, composable operation.
                 sort: function(f) {
@@ -496,6 +497,62 @@
                     var array = sloth.wrapIter(iter).force();
                     array.sort(f);
                     return sloth.wrapIter(sloth.iterArray(array));
+                },
+
+                // `tee` splits the sequence into two independent sequence
+                // iterators.
+                //
+                // This may allocate a large amount of additional storage, and
+                // _will_ exhibit unbounded growth on infinite sequences.
+                //
+                // The original iterator should not be used.
+                //
+                // This is a lazy, non-composable operation.
+                tee: function() {
+                    var left = [];
+                    var right = [];
+
+                    var makeIter = function(queue) {
+                        return function() {
+                            var value;
+
+                            if(!queue.length) {
+                                value = iter();
+
+                                left.unshift(value);
+                                right.unshift(value);
+                            }
+
+                            return queue.pop();
+                        };
+                    };
+
+                    return [makeIter(left), makeIter(right)];
+                },
+
+                // `zip` takes the sequences passed to it and yields a new
+                // sequence taking an element from each element and placing it
+                // into an array. The length of the resulting sequence is the
+                // length of the shortest sequence passed in.
+                //
+                // This is somewhat more useful with JavaScript 1.7
+                // destructuring assignment.
+                //
+                // This is a lazy, composable operation.
+                zip: function() {
+                    var iters = Array.prototype.slice.call(arguments);
+                    iters.unshift(iter);
+
+                    return sloth.wrapIter(function() {
+                        var i;
+                        var output = [];
+
+                        for(i = 0; i < iters.length; ++i) {
+                            output.push(iters[i]());
+                        }
+
+                        return output;
+                    });
                 },
 
                 // `force` gets all the elements from the iterator and places
