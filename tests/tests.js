@@ -650,7 +650,7 @@
     var sloth;
 
     if(typeof module !== "undefined" && module.exports) {
-        sloth = require('./sloth.js');
+        sloth = require(__dirname + '/../sloth.js');
         module.exports = tests;
     }
     if(typeof window !== "undefined") {
