@@ -400,7 +400,8 @@ sequence can be <code>nub()</code>ed.</p>
 
 <p>This is a strict, composable operation.</p>
 
-<pre><code>&gt; sloth.ify([1, 2, 3, 3]).difference([3, 4, 4, 5]).force();
+<pre><code>&gt; sloth.ify([1, 2, 3, 3]).
+... symmetricDifference([3, 4, 4, 5]).force();
 [ 1, 2, 4, 4, 5 ]
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">symmetricDifference</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ys</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
                     <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>

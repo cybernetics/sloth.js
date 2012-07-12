@@ -449,7 +449,8 @@
                 //
                 // This is a strict, composable operation.
                 //
-                //     > sloth.ify([1, 2, 3, 3]).difference([3, 4, 4, 5]).force();
+                //     > sloth.ify([1, 2, 3, 3]).
+                //     ... symmetricDifference([3, 4, 4, 5]).force();
                 //     [ 1, 2, 4, 4, 5 ]
                 symmetricDifference: function(ys, f) {
                     var _this = this;
