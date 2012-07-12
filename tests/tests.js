@@ -70,7 +70,7 @@
             } else {
                 test.expect(4);
                 var i = 1;
-                for(var v in sloth.wrapIter(sloth.iterArray([1, 2, 3, 4]))) {
+                for(var v in new sloth.Slothified(sloth.iterArray([1, 2, 3, 4]))) {
                     test.strictEqual(i++, v);
                 }
                 test.done();
