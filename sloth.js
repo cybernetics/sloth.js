@@ -19,11 +19,12 @@
     //
     // `sloth.js` is freely distributable under the terms of the MIT license.
     var sloth = {
-        // ## Slothification
+        // ## sloth.ify `sloth.ify(xs)`
         //
-        // `sloth.ify` a sequence, making it usable with `sloth.js` operations.
-        // Slothification is an idempotent operation, meaning it can be used
-        // on a slothified variable multiple times without any issue.
+        // `sloth.ify` a sequence `xs`, returning an object usable with
+        // `sloth.js` operations. Slothification is an idempotent operation,
+        // meaning it can be used on a slothified variable multiple times
+        // without any issue.
         //
         // ### Terminology
         //
@@ -50,7 +51,7 @@
         // chain, usually culminating in a result.
         ify: function(xs) {
             if(xs.slothified) return xs;
-            return new sloth.Slothified(sloth.iterify(xs));
+            return new sloth.Slothified(sloth.iter(xs));
         },
 
         Slothified: (function() {
@@ -64,7 +65,10 @@
 
                 // ## Maps, filters and folds
 
-                // `map` applies a function across all elements of a sequence.
+                // ### map `map(f)`
+                //
+                // `map` applies a function `f` across all elements of a
+                // sequence.
                 //
                 // This is a lazy, composable operation.
                 map: function(f) {
@@ -75,8 +79,10 @@
                     });
                 },
 
+                // ### filter `filter(f)`
+                //
                 // `filter` selects elements from a sequence that are `true`
-                // when the predicate is applied to them.
+                // when the predicate `f` is applied to them.
                 //
                 // This is a lazy, composable operation.
                 filter: function(f) {
@@ -89,6 +95,8 @@
                     });
                 },
 
+                // ### foldl `foldl(f, acc=this.next())`
+                //
                 // `foldl` is an implementation of the left-fold operation,
                 // also known as a left-reduce or inject.
                 //
@@ -102,6 +110,8 @@
                     return acc;
                 },
 
+                // ### foldr `foldr(f, acc=this.next())`
+                //
                 // `foldr` is an implementation of the right-fold operation,
                 // the reverse analog of `foldl` operation.
                 //
@@ -124,8 +134,10 @@
 
                 // ## Quantification
 
+                // ### all `all(f=sloth.id)`
+                //
                 // `all` checks if all values in the sequence are truthy or
-                // fulfill the predicate (universal quantification).
+                // fulfill the predicate `f` (universal quantification).
                 //
                 // This is a partially strict non-composable operation.
                 all: function(f) {
@@ -144,8 +156,10 @@
                     return true;
                 },
 
+                // ### any `any(f=sloth.id)`
+                //
                 // `any` checks if any values in the sequence are truthy or
-                // fulfill the predicate (existential quantification).
+                // fulfill the predicate `f` (existential quantification).
                 //
                 // This is a partially strict non-composable operation.
                 any: function(f) {
@@ -166,8 +180,10 @@
 
                 // ## Maxima and minima
 
-                // `max` returns the maximum value of the sequence using a
-                // given comparison function.
+                // ### max `max(f=sloth.cmp)`
+                //
+                // `max` returns the maximum value of the sequence using the
+                // comparison function `f`.
                 //
                 // If you're looking for the maximum of an array, it is much
                 // more efficient to use `Math.max.apply(Math, array)` (up to
@@ -182,8 +198,10 @@
                     });
                 },
 
-                // `min` returns the minimum value of the sequence using a
-                // given comparison function.
+                // ### min `min(f=sloth.cmp)`
+                //
+                // `min` returns the minimum value of the sequence using the
+                // comparison function `f`.
                 //
                 // If you're looking for the minimum of an array, it is much
                 // more efficient to use `Math.min.apply(Math, array)` (up to
@@ -200,7 +218,9 @@
 
                 // ## Taking and skipping
 
-                // `take` yields a sequence with only the first _n_ elements of
+                // ### take `take(n)`
+                //
+                // `take` yields a sequence with only the first `n` elements of
                 // the original sequence.
                 //
                 // This is a lazy, composable operation.
@@ -214,7 +234,9 @@
                     });
                 },
 
-                // `skip` yields a sequence without the first _n_ elements of
+                // ### skip `skip(n)`
+                //
+                // `skip` yields a sequence without the first `n` elements of
                 // the original sequence.
                 //
                 // This is a lazy, composable operation.
@@ -230,8 +252,11 @@
                     });
                 },
 
+                // ### takeWhile `takeWhile(f)`
+                //
                 // `takeWhile` yields a sequence with only the first
-                // contiguous sequence of elements that fulfill the predicate.
+                // contiguous sequence of elements that fulfill the predicate
+                // `f`.
                 //
                 // This is a lazy, composable operation.
                 takeWhile: function(f) {
@@ -247,8 +272,11 @@
                     });
                 },
 
+                // ### skipWhile `skipWhile(f)`
+                //
                 // `skipWhile` yields a sequence without the first
-                // contiguous sequence of elements that fulfill the predicate.
+                // contiguous sequence of elements that fulfill the predicate
+                // `f`.
                 //
                 // This is a lazy, composable operation.
                 skipWhile: function(f) {
@@ -268,8 +296,11 @@
 
                 // ## Set operations
 
+                // ### union `union(ys, f=sloth.eq)`
+                //
                 // `union` yields a sequence with only the unique elements from
-                // both sequences, using the given predicate for comparison.
+                // this sequence and `ys`, using the given predicate `f` for
+                // equality.
                 //
                 // This will drain the `ys` iterator.
                 //
@@ -282,13 +313,15 @@
                     return this.concat(ys).nub(f);
                 },
 
+                // ### intersect `intersect(ys, f=sloth.eq)`
+                //
                 // `intersect` yields a sequence with only the unique elements
-                // present in both sequences, using the given predicate for
-                // comparison.
+                // present in this sequence and `ys`, using the given predicate
+                // `f` for equality.
                 //
                 // This will drain the `ys` iterator.
                 //
-                // Yet again, this can be slow due to the use of `nub`.
+                // Again, this can be slow due to the use of `nub`.
                 //
                 // This is a semi-strict composable operation, as it requires
                 // the first iterator to be non-infinite.
@@ -312,8 +345,11 @@
                     });
                 },
 
+                // ### difference `difference(ys, f=sloth.eq)`
+                //
                 // `difference` yields a sequence with the elements of sequence
-                // B removed from sequence A.
+                // `ys` removed from this sequence, using the given predicate
+                // `f` for equality.
                 //
                 // This will drain the `ys` iterator.
                 //
@@ -349,8 +385,11 @@
                     });
                 },
 
+                // ### symmetricDifference `symmetricDifference(ys, f=sloth.eq)`
+                //
                 // `symmetricDifference` yields a sequence of the elements
-                // present in neither sequence.
+                // present in neither this sequence nor `ys`, using the given
+                // predicate `f` for equality.
                 //
                 // This will drain the `ys` iterator.
                 //
@@ -397,8 +436,10 @@
 
                 // ## Sequence utilities
 
+                // ### each `each(f)`
+                //
                 // `each` acts as a for-each loop and iterates through all
-                // elements of the sequence, applying the given function to
+                // elements of the sequence, applying the given function `f` to
                 // each.
                 //
                 // `sloth.StopIteration` can be thrown at any time to break out
@@ -420,7 +461,9 @@
                     }
                 },
 
-                // `concat` joins two sequences to each other, end-to-end.
+                // ### concat `concat(ys)`
+                //
+                // `concat` joins this sequence with `ys`, end-to-end.
                 //
                 // This will drain the `ys` iterator.
                 //
@@ -446,8 +489,11 @@
                     });
                 },
 
-                // `product` yields the Cartesian product of a series of
-                // sequences.
+                // ### product `each(ys, ...)`
+                //
+                // `product` yields the Cartesian product of all the sequences
+                // passed in and this sequence, equivalent to a series of
+                // nested loops.
                 //
                 // This will completely drain all iterators.
                 //
@@ -484,6 +530,8 @@
                     }, [[]])));
                 },
 
+                // ### cycle `cycle()`
+                //
                 // `cycle` loops a list around itself infinitely.
                 //
                 // This is a lazy, composable operation.
@@ -509,8 +557,10 @@
                     });
                 },
 
+                // ### nub `nub(f=sloth.eq)`
+                //
                 // `nub` removes duplicate elements from the sequence using
-                // the given predicate for comparison.
+                // the given predicate `f` for equality.
                 //
                 // This is up to 10x slower than Underscore.js's `uniq`, but is
                 // more flexible in its operation.
@@ -540,6 +590,8 @@
                     });
                 },
 
+                // ### enumerate `enumerate()`
+                //
                 // `enumerate` takes each element and places it in an array
                 // with the index as the first element.
                 //
@@ -553,7 +605,9 @@
                     });
                 },
 
-                // `reverse` reverses the sequence.
+                // ### reverse `reverse()`
+                //
+                // `reverse` yields the reverse iterator of this sequence.
                 //
                 // This is a strict, composable operation.
                 reverse: function() {
@@ -566,7 +620,9 @@
                     });
                 },
 
-                // `sort` sorts the sequence using a comparison function.
+                // ### sort `sort(f=sloth.cmp)`
+                //
+                // `sort` sorts the sequence using the comparison function `f`.
                 //
                 // This is a strict, composable operation.
                 sort: function(f) {
@@ -577,6 +633,8 @@
                     return new sloth.Slothified(sloth.iterArray(array));
                 },
 
+                // ### tee `tee()`
+                //
                 // `tee` splits the sequence into two independent sequence
                 // iterators.
                 //
@@ -607,9 +665,12 @@
                         };
                     };
 
-                    return [makeIter(left), makeIter(right)];
+                    return [sloth.ify(makeIter(left)),
+                            sloth.ify(makeIter(right))];
                 },
 
+                // ### zip `zip(ys, ...)`
+                //
                 // `zip` takes the sequences passed to it and yields a new
                 // sequence taking an element from each element and placing it
                 // into an array. The length of the resulting sequence is the
@@ -640,6 +701,8 @@
                     });
                 },
 
+                // ### force `force()`
+                //
                 // `force` gets all the elements from the iterator and places
                 // them into an array.
                 //
@@ -680,9 +743,11 @@
         // `sloth.StopIteration`, is thrown to indicate the end of the
         // sequence.
 
-        // `iterify` creates an low-level iterator for various common data
+        // ### iter `iter(xs)`
+        //
+        // `iter` creates an low-level iterator for various common data
         // types.
-        iterify: function(xs) {
+        iter: function(xs) {
             // Check if the object is a function (and therefore can be used as
             // an iterator).
             if(xs && xs.constructor && xs.call && xs.apply) {
@@ -707,6 +772,8 @@
             return sloth.iterObject(xs);
         },
 
+        // ### iterArray `iterArray(array)`
+        //
         // Create an iterator for an array. Note that this is the low-level
         // iterator and needs to be `new sloth.Slothified`ed for useful things.
         iterArray: function(array) {
@@ -718,6 +785,8 @@
             };
         },
 
+        // ### iterString `iterString(string)`
+        //
         // Create an iterator for a string.  Note that this is the low-level
         // iterator and needs to be `new sloth.Slothified`ed for useful things.
         iterString: function(string) {
@@ -729,6 +798,8 @@
             };
         },
 
+        // ### iterObject `iterObject(string)`
+        //
         // Create an iterator for an object which yields pairs of keys and
         // values. This will immediately read in the object and generate a
         // list of its keys and values and, as such, won't reflect any changes
@@ -742,6 +813,8 @@
             return sloth.iterArray(items);
         },
 
+        // ### iterGenerator `iterGenerator(generator)`
+        //
         // Create an iterator for a generator (JavaScript 1.7 only).
         iterGenerator: function(generator) {
             return function() {
@@ -749,6 +822,8 @@
             };
         },
 
+        // ### iterRange `iterGenerator([a,] b[, step])`
+        //
         // Create an iterator for a range. Comes in three variants:
         //
         // * If only a single argument `a` is provided, an iterator for a range
@@ -780,7 +855,7 @@
             };
         },
 
-        // ### StopIteration
+        // ### StopIteration `StopIteration`
         //
         // `StopIteration` is an object which is thrown to indicate that the
         // iterator has no more data left to yield, i.e. an end-of-stream
@@ -800,11 +875,15 @@
 
         // ## Utility functions
 
+        // ### id `id(x)`
+        //
         // A function where, given a value, returns the value (a la Haskell).
         id: function(x) {
             return x;
         },
 
+        // ### cmp `cmp(a, b)`
+        //
         // The default comparison function, combining both lexicographic and
         // numerical semantics.
         cmp: function(a, b) {
@@ -813,6 +892,8 @@
                    0;
         },
 
+        // ### eq `eq(a, b)`
+        //
         // The default equality function, which returns the strict equality of
         // two values.
         eq: function(a, b) {

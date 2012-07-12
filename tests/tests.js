@@ -626,7 +626,7 @@
             test.expect(10);
             var iters = sloth.ify([1, 2, 3, 4]).tee();
 
-            var iter = iters[0];
+            var iter = iters[0].next;
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
             test.strictEqual(3, iter());
@@ -637,7 +637,7 @@
                 test.strictEqual(sloth.StopIteration, e);
             }
 
-            var iter = iters[1];
+            var iter = iters[1].next;
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
             test.strictEqual(3, iter());
