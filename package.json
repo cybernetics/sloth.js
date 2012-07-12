@@ -1,6 +1,6 @@
 {
     "name": "sloth",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "author": "Tony Young <tony@rfw.name>",
     "description": "A lazy iterator framework for JavaScript.",
     "main": "./sloth",
