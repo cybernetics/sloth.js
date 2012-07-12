@@ -473,11 +473,11 @@
                     // annotations will be provided in the form of Haskell
                     // code.
                     //
-                    //     product = foldl f [[]] arrays
+                    //     product arrays = foldl f [[]] arrays
                     return new sloth.Slothified(sloth.iterArray(new sloth.Slothified(sloth.iterArray(arrays)).foldl(function(accs, xs) {
-                        //         where f accs xs = foldl g [] xs
+                        //         where f accs xs = foldl (g accs) [] xs
                         return new sloth.Slothified(sloth.iterArray(xs)).foldl(function(acc, x) {
-                            //               g acc x = acc ++ (zs x)
+                            //               g accs acc x = acc ++ (zs x accs)
                             return new sloth.Slothified(sloth.iterArray(acc)).concat(
                                 //               zs x = map (h x) accs
                                 sloth.iterArray(new sloth.Slothified(sloth.iterArray(accs)).map(function(ys) {
