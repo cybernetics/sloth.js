@@ -554,7 +554,7 @@
                     });
                 },
 
-                // ### product `each(ys, ...)`
+                // ### product `product(ys, ...)`
                 //
                 // `product` yields the Cartesian product of all the sequences
                 // passed in and this sequence, equivalent to a series of
