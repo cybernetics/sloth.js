@@ -71,6 +71,10 @@
                 // sequence.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).
+                //     ... map(function(x) { return x + 1; }).force();
+                //     [ 2, 3, 4 ]
                 map: function(f) {
                     var _this = this;
 
@@ -85,6 +89,10 @@
                 // when the predicate `f` is applied to them.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).
+                //     ... filter(function(x) { return x > 2; }).force();
+                //     [ 3 ]
                 filter: function(f) {
                     var _this = this;
 
@@ -101,6 +109,10 @@
                 // also known as a left-reduce or inject.
                 //
                 // This is a strict, non-composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).
+                //     ... foldl(function(acc, x) { return acc + x; }, 1);
+                //     [ 7 ]
                 foldl: function(f, acc) {
                     if(arguments.length == 1) acc = this.next();
 
@@ -119,6 +131,10 @@
                 // first be reversed.
                 //
                 // This is a strict, non-composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).
+                //     ... foldr(function(x, acc) { return acc + x; }, 1);
+                //     [ 7 ]
                 foldr: function(f, acc) {
                     var reverseIter = new sloth.Slothified(this.next)
                         .reverse()
@@ -140,6 +156,9 @@
                 // fulfill the predicate `f` (universal quantification).
                 //
                 // This is a partially strict non-composable operation.
+                //
+                //     > sloth.ify([true, true, false]).all()
+                //     false
                 all: function(f) {
                     if(typeof f === "undefined") f = sloth.id;
                     var value;
@@ -162,6 +181,9 @@
                 // fulfill the predicate `f` (existential quantification).
                 //
                 // This is a partially strict non-composable operation.
+                //
+                //     > sloth.ify([true, true, false]).any()
+                //     true
                 any: function(f) {
                     if(typeof f === "undefined") f = sloth.id;
                     var value;
@@ -190,6 +212,9 @@
                 // 40x(!!) faster).
                 //
                 // This is a strict, non-composable operation.
+                //
+                //     > sloth.ify([3, 4, 1]).max()
+                //     4
                 max: function(f) {
                     if(typeof f === "undefined") f = sloth.cmp;
 
@@ -208,6 +233,9 @@
                 // 40x(!!) faster).
                 //
                 // This is a strict, non-composable operation.
+                //
+                //     > sloth.ify([3, 4, 1]).min()
+                //     1
                 min: function(f) {
                     if(typeof f === "undefined") f = sloth.cmp;
 
@@ -224,6 +252,9 @@
                 // the original sequence.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).take(2).force();
+                //     [ 1, 2 ]
                 take: function(n) {
                     var _this = this;
 
@@ -240,6 +271,9 @@
                 // the original sequence.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).skip(2).force();
+                //     [ 3 ]
                 skip: function(n) {
                     var _this = this;
 
@@ -259,6 +293,10 @@
                 // `f`.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3, 1, 2, 3]).
+                //     ... takeWhile(function(x) { return x < 3; }).force();
+                //     [ 1, 2 ]
                 takeWhile: function(f) {
                     var _this = this;
 
@@ -279,6 +317,10 @@
                 // `f`.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3, 1, 2, 3]).
+                //     ... skipWhile(function(x) { return x < 3; }).force();
+                //     [ 3, 1, 2, 3 ]
                 skipWhile: function(f) {
                     var _this = this;
 
@@ -307,6 +349,9 @@
                 // This can be slow due to the use of `nub`.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3, 3]).union([3, 4, 4, 5]).force();
+                //     [ 1, 2, 3, 4, 5 ]
                 union: function(ys, f) {
                     if(typeof f === "undefined") f = sloth.eq;
 
@@ -325,6 +370,9 @@
                 //
                 // This is a semi-strict composable operation, as it requires
                 // the first iterator to be non-infinite.
+                //
+                //     > sloth.ify([1, 2, 3, 3]).intersect([3, 4, 4, 5]).force();
+                //     [ 3 ]
                 intersect: function(ys, f) {
                     if(typeof f === "undefined") f = sloth.eq;
 
@@ -358,6 +406,9 @@
                 //
                 // This is a semi-strict composable operation, as it requires
                 // the second iterator to be non-infinite.
+                //
+                //     > sloth.ify([1, 2, 3, 3]).difference([3, 4, 4, 5]).force();
+                //     [ 1, 2 ]
                 difference: function(ys, f) {
                     var _this = this;
 
@@ -397,6 +448,9 @@
                 // sequence can be `nub()`ed.
                 //
                 // This is a strict, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3, 3]).difference([3, 4, 4, 5]).force();
+                //     [ 1, 2, 4, 4, 5 ]
                 symmetricDifference: function(ys, f) {
                     var _this = this;
                     if(typeof f === "undefined") f = sloth.eq;
@@ -440,12 +494,19 @@
                 //
                 // `each` acts as a for-each loop and iterates through all
                 // elements of the sequence, applying the given function `f` to
-                // each.
+                // each. The current index is passed as the second parameter to
+                // `f`.
                 //
                 // `sloth.StopIteration` can be thrown at any time to break out
                 // of the loop.
                 //
                 // This is a strict, non-composable operation.
+                //
+                //     > sloth.ify([1, 2, 3, 3]).each(console.log);
+                //     1 0
+                //     2 1
+                //     3 2
+                //     3 3
                 each: function(f) {
                     var value;
                     var i = 0;
@@ -468,6 +529,9 @@
                 // This will drain the `ys` iterator.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).concat([3, 4, 5]).force();
+                //     [1, 2, 3, 3, 4, 5]
                 concat: function(ys) {
                     var _this = this;
 
@@ -499,6 +563,9 @@
                 //
                 // This is a strict, composable operation (until someone
                 // figures out a lazy version).
+                //
+                //     > sloth.ify([1, 2]).product([3, 4]).force();
+                //     [ [ 1, 3 ], [ 2, 3 ], [ 1, 4 ], [ 2, 4 ] ]
                 product: function() {
                     var arrays = Array.prototype.slice.call(arguments);
                     arrays.unshift(this);
@@ -535,6 +602,9 @@
                 // `cycle` loops a list around itself infinitely.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2]).cycle().take(6).force();
+                //     [ 1, 2, 1, 2, 1, 2 ]
                 cycle: function() {
                     var _this = this;
 
@@ -566,6 +636,9 @@
                 // more flexible in its operation.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 2, 3, 3]).nub().force();
+                //     [ 1, 2, 3 ]
                 nub: function(f) {
                     var _this = this;
 
@@ -596,6 +669,9 @@
                 // with the index as the first element.
                 //
                 // This is a lazy, composable operaton.
+                //
+                //     > sloth.ify([1, 2, 2, 3, 3]).enumerate().force();
+                //     [ [ 0, 1 ], [ 1, 2 ], [ 2, 2 ], [ 3, 3 ], [ 4, 3 ] ]
                 enumerate: function() {
                     var _this = this;
 
@@ -610,6 +686,9 @@
                 // `reverse` yields the reverse iterator of this sequence.
                 //
                 // This is a strict, composable operation.
+                //
+                //     > sloth.ify([1, 2, 2, 3, 3]).reverse().force();
+                //     [ 3, 3, 2, 2, 1 ]
                 reverse: function() {
                     var array = this.force();
                     var n = array.length;
@@ -625,6 +704,9 @@
                 // `sort` sorts the sequence using the comparison function `f`.
                 //
                 // This is a strict, composable operation.
+                //
+                //     > sloth.ify([1, 4, 3, 5, 2]).sort().force();
+                //     [ 1, 2, 3, 4, 5 ]
                 sort: function(f) {
                     if(typeof f === "undefined") f = sloth.cmp;
 
@@ -644,6 +726,12 @@
                 // The original iterator should not be used.
                 //
                 // This is a lazy, non-composable operation.
+                //
+                //     > iters = sloth.ify([1, 2, 3, 4, 5]).tee();
+                //     > iters[0].force();
+                //     [ 1, 2, 3, 4, 5 ]
+                //     > iters[1].force();
+                //     [ 1, 2, 3, 4, 5 ]
                 tee: function() {
                     var _this = this;
 
@@ -680,6 +768,9 @@
                 // destructuring assignment.
                 //
                 // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).zip([2, 3, 4], [3, 4, 5]).force();
+                //     [ [ 1, 2, 3 ], [ 2, 3, 4 ], [ 3, 4, 5 ] ]
                 zip: function() {
                     var iters = Array.prototype.slice.call(arguments);
                     iters.unshift(this);
@@ -707,6 +798,9 @@
                 // them into an array.
                 //
                 // This is a strict, non-composable operation.
+                //
+                //     > sloth.ify([1, 2, 3]).force();
+                //     [ 1, 2, 3 ]
                 force: function() {
                     var output = [];
                     var value;
