@@ -53,13 +53,6 @@
             return new sloth.Slothified(sloth.iterify(xs));
         },
 
-        // ## Wrapping
-        //
-        // Wrap an iterator with various fun utility functions, which can be
-        // composed to yield lazy sequences.
-        //
-        // This function is _not_ idempotent! If `iter` is already wrapped,
-        // invoking `wrapIter` on it will result in breakage.
         Slothified: (function() {
             var Slothified = function(iter) {
                 this.next = iter;
