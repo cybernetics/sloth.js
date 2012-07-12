@@ -124,7 +124,7 @@
                     if(arguments.length == 1) acc = reverseIter();
 
                     new sloth.Slothified(reverseIter).each(function(x) {
-                        acc = f(acc, x);
+                        acc = f(x, acc);
                     });
                     return acc;
                 },

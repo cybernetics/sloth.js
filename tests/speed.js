@@ -51,7 +51,7 @@
 
     JSLitmus.test('sloth.ify().foldr()', function() {
         return sloth.ify(numbers)
-            .foldr(function(acc, x) {
+            .foldr(function(x, acc) {
                 return acc + x;
             }, 10);
     });

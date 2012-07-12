@@ -391,7 +391,7 @@
         testFoldr: function(test) {
             test.expect(1);
             test.strictEqual(-2, sloth.ify([1, 2, 3, 4])
-                .foldr(function(acc, x) { return acc - x; })
+                .foldr(function(x, acc) { return acc - x; })
             );
             test.done();
         },
@@ -399,7 +399,7 @@
         testFoldrWithAcc: function(test) {
             test.expect(1);
             test.strictEqual(0, sloth.ify([1, 2, 3, 4])
-                .foldr(function(acc, x) { return acc - x; }, 10)
+                .foldr(function(x, acc) { return acc - x; }, 10)
             );
             test.done();
         },
@@ -407,7 +407,7 @@
         testFoldrWithSingle: function(test) {
             test.expect(1);
             test.strictEqual(1, sloth.ify([1])
-                .foldr(function(acc, x) { return acc - x; })
+                .foldr(function(x, acc) { return acc - x; })
             );
             test.done();
         },
@@ -415,7 +415,7 @@
         testFoldrWithSingleAcc: function(test) {
             test.expect(1);
             test.strictEqual(9, sloth.ify([1])
-                .foldr(function(acc, x) { return acc - x; }, 10)
+                .foldr(function(x, acc) { return acc - x; }, 10)
             );
             test.done();
         },
