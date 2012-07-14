@@ -53,7 +53,7 @@
             } else {
                 test.expect(4);
                 eval("var gen = function() { for(;;) yield 1; };");
-                var iter = sloth.iterGenerator(gen());
+                var iter = sloth.iterNextable(gen());
                 test.strictEqual(1, iter());
                 test.strictEqual(1, iter());
                 test.strictEqual(1, iter());
@@ -164,9 +164,9 @@
             test.done();
         },
 
-        testIterRange: function(test) {
+        testRange: function(test) {
             test.expect(3);
-            var iter = sloth.iterRange(1, 5, 2);
+            var iter = sloth.range(1, 5, 2).next;
             test.strictEqual(1, iter());
             test.strictEqual(3, iter());
             try {
@@ -177,9 +177,9 @@
             test.done();
         },
 
-        testIterRangeDefaultStep: function(test) {
+        testRangeDefaultStep: function(test) {
             test.expect(5);
-            var iter = sloth.iterRange(1, 5);
+            var iter = sloth.range(1, 5).next;
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
             test.strictEqual(3, iter());
@@ -192,9 +192,9 @@
             test.done();
         },
 
-        testIterRangeOpen: function(test) {
+        testRangeLeft: function(test) {
             test.expect(5);
-            var iter = sloth.iterRange(4);
+            var iter = sloth.range(4).next;
             test.strictEqual(0, iter());
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
@@ -204,6 +204,41 @@
             } catch(e) {
                 test.strictEqual(sloth.StopIteration, e);
             }
+            test.done();
+        },
+
+        testRangeInfinite: function(test) {
+            test.expect(4);
+            var iter = sloth.range(0, null).next;
+            test.strictEqual(0, iter());
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.done();
+        },
+
+        testRepeatFinite: function(test) {
+            test.expect(5);
+            var iter = sloth.repeat(0, 4).next;
+            test.strictEqual(0, iter());
+            test.strictEqual(0, iter());
+            test.strictEqual(0, iter());
+            test.strictEqual(0, iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },
+
+        testRepeatInfinite: function(test) {
+            test.expect(4);
+            var iter = sloth.repeat(0).next;
+            test.strictEqual(0, iter());
+            test.strictEqual(0, iter());
+            test.strictEqual(0, iter());
+            test.strictEqual(0, iter());
             test.done();
         },
 

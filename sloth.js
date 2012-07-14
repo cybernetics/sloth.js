@@ -695,7 +695,7 @@
                     var n = array.length;
 
                     return new sloth.Slothified(function() {
-                        if(n == 0) throw sloth.StopIteration;
+                        if(n === 0) throw sloth.StopIteration;
                         return array[--n];
                     });
                 },
@@ -830,6 +830,51 @@
             return Slothified;
         })(),
 
+        // ## Additional slothifications
+
+        // ### range `range(b)` or `range(a=0, b=Infinity, step=1)`
+        //
+        // Create a range. Comes in two variants:
+        //
+        // * If only a single argument `a` is provided, an iterator for a range
+        //   from 0 to `a - 1` by a step of 1.
+        //
+        // * If all three arguments are specified, a range from `a` to `b - 1`
+        //   is created by a step of `step`. If `b` is `null`, an infinite
+        //   range is generated.
+        //
+        // Note that the end of the range does not include `b` --- this is
+        // influenced by Python's `range` function.
+        range: function(a, b, step) {
+            if(arguments.length == 1) {
+                b = a;
+                a = 0;
+                step = 1;
+            } else if(typeof step === "undefined") {
+                step = 1;
+
+                if(b === null) b = Infinity;
+            }
+
+            return sloth.ify(function() {
+                if(a >= b) throw sloth.StopIteration;
+                return (a += step) - step;
+            });
+        },
+
+        // ### repeat `repeat(x, n=Infinity)`
+        //
+        // Repeat an element `n` times.
+        repeat: function(x, n) {
+            if(n === null) n = Infinity;
+
+            return sloth.ify(function() {
+                if(n === 0) throw sloth.StopIteration;
+                n--;
+                return x;
+            });
+        },
+
         // ## Iterators
         //
         // A lazy iterator in `sloth.js` is defined as a function (usually a
@@ -849,9 +894,9 @@
                 return xs;
             }
 
-            // Check if the object is a generator (JavaScript 1.7 only).
+            // Check if the object has a next() function.
             if(typeof xs.next !== "undefined") {
-                return sloth.iterGenerator(xs);
+                return sloth.iterNextable(xs);
             }
 
             // Check if the object is a `String`.
@@ -908,45 +953,13 @@
             return sloth.iterArray(items);
         },
 
-        // ### iterGenerator `iterGenerator(generator)`
+        // ### iterNextable `iterNextable(nextable)`
         //
-        // Create an iterator for a generator (JavaScript 1.7 only).
-        iterGenerator: function(generator) {
+        // Create an iterator for an object with a .next() function
+        // (such as generators in JavaScript 1.7).
+        iterNextable: function(nextable) {
             return function() {
-                return generator.next();
-            };
-        },
-
-        // ### iterRange `iterGenerator([a,] b[, step])`
-        //
-        // Create an iterator for a range. Comes in three variants:
-        //
-        // * If only a single argument `a` is provided, an iterator for a range
-        //   from 0 to `a - 1` by a step of 1.
-        //
-        // * If the third argument, `step`, is left unspecified, the step
-        //   defaults to 1.
-        //
-        // * If all three arguments are specified, a range from `a` to `b - 1`
-        //   is created by a step of `step`.
-        //
-        // Note that the end of the range does not include `b` --- this is
-        // influenced by Python's `range` function.
-        //
-        // Also note that this is the low-level iterator and needs to be
-        // `new sloth.Slothified`ed for useful things.
-        iterRange: function(a, b, step) {
-            if(arguments.length == 1) {
-                b = a;
-                a = 0;
-                step = 1;
-            } else if(typeof step === "undefined") {
-                step = 1;
-            }
-
-            return function() {
-                if(a >= b) throw sloth.StopIteration;
-                return (a += step) - step;
+                return nextable.next();
             };
         },
 
