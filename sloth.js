@@ -716,6 +716,133 @@
                     return new sloth.Slothified(sloth.iterArray(array));
                 },
 
+                // ### group `group(f=sloth.eq)`
+                //
+                // `group` groups the sequence into subsequences using the
+                // predicate function `f`.
+                //
+                // This is a lazy, composable operation.
+                //
+                //     > sloth.ify([1, 1, 2, 3, 4]).
+                //     ... group().
+                //     ... map(function(x) { return x.force() } ).force();
+                //     [ [ 1, 1 ], [ 2 ], [ 3 ], [ 4 ] ]
+                group: function(f) {
+                    var _this = this;
+
+                    if(typeof f === "undefined") f = sloth.eq;
+
+                    // `backCount` stores how many queues haven't been made
+                    // iterable yet.
+                    var backCount = 0;
+
+                    // The `starts` array stores the first value that matches
+                    // the given predicate function.
+                    var starts = [];
+
+                    // The `queues` array maintains queues of values for each
+                    // group.
+                    var queues = [];
+
+                    var iterQueue = function(j) {
+                        return new sloth.Slothified(function() {
+                            var i;
+                            var value;
+                            var fillsQueue;
+
+                            // If we have elements in the queue, we can
+                            // pop it off and we're done.
+                            if(queues[j].length) {
+                                return queues[j].pop();
+                            }
+
+                            // Otherwise, we need to search the rest of the
+                            // list for it.
+                            for(;;) {
+                                fillsQueue = false;
+                                value = _this.next();
+
+                                // This value matches the predicate, so we're
+                                // done.
+                                if(f(starts[j], value)) {
+                                    return value;
+                                }
+
+                                // Otherwise, this value could possibly be
+                                // for another queue.
+                                for(i = 0; i < queues.length; ++i) {
+                                    if(f(starts[i], value)) {
+                                        // This value matches another queue.
+                                        queues[i].unshift(value);
+                                        fillsQueue = true;
+                                        break;
+                                    }
+                                }
+
+                                // We've filled the queue, so this isn't the
+                                // value we're looking for.
+                                if(fillsQueue) continue;
+
+                                // This value actually starts a new queue.
+                                starts.push(value);
+                                queues.push([value]);
+
+                                // We increment the backlog count by 1 so the
+                                // parent iterator knows that we've created a
+                                // new queue.
+                                backCount++;
+                            }
+                        });
+                    };
+
+                    return new sloth.Slothified(function() {
+                        var i;
+                        var value;
+                        var fillsQueue;
+
+                        for(;;) {
+                            // We may be somewhat backlogged, so yield that
+                            // queue first.
+                            if(backCount > 0) {
+                                return iterQueue(queues.length - (backCount--));
+                            }
+
+                            fillsQueue = false;
+                            value = _this.next();
+
+                            // First of all, push this value to all interested
+                            // queues.
+                            for(i = 0; i < queues.length; ++i) {
+                                if(f(starts[i], value)) {
+                                    // This value matches a value in starts, so
+                                    // the interested queue gets a value pushed
+                                    // to it.
+                                    //
+                                    // However, we've concluded that this value
+                                    // could not possibly yield a new iterator,
+                                    // so we move along to the next value.
+                                    queues[i].unshift(value);
+                                    fillsQueue = true;
+                                    break;
+                                }
+                            }
+
+                            // We've filled the queue, so we haven't found the
+                            // start of a new group yet.
+                            if(fillsQueue) continue;
+
+                            // This must be the start of a new group, so we
+                            // create a new queue and push a new starting value
+                            // for the queue.
+                            starts.push(value);
+                            queues.push([value]);
+
+                            // Return to an iterator for this group.
+                            return iterQueue(starts.length - 1);
+                        }
+                    });
+                },
+
                 // ### tee `tee()`
                 //
                 // `tee` splits the sequence into two independent sequence

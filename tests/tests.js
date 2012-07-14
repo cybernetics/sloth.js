@@ -391,6 +391,36 @@
             test.done();
         },
 
+        testGroup: function(test) {
+            test.expect(1);
+            var groups = sloth.ify([9, 2, 3, 2, 4, 1, 1, 2])
+                .group()
+                .map(function(x) { return x.force(); } )
+                .force();
+            test.deepEqual([[9], [2, 2, 2], [3], [4], [1, 1]], groups);
+            test.done();
+        },
+
+        testGroupAlternativeForce: function(test) {
+            test.expect(1);
+            var groups = sloth.ify([9, 2, 3, 2, 4, 1, 1, 2]).group().force();
+            for(var i = 0; i < groups.length; ++i) {
+                groups[i] = groups[i].force();
+            }
+            test.deepEqual([[9], [2, 2, 2], [3], [4], [1, 1]], groups);
+            test.done();
+        },
+
+        testGroupPredicate: function(test) {
+            test.expect(1);
+            var groups = sloth.ify([{n:9}, {n:2}, {n:3}, {n:2}, {n:4}, {n:1}, {n:1}, {n:2}])
+                .group(function(x, y) { return x.n == y.n; })
+                .map(function(x) { return x.force(); } )
+                .force();
+            test.deepEqual([[{n:9}], [{n:2}, {n:2}, {n:2}], [{n:3}], [{n:4}], [{n:1}, {n:1}]], groups);
+            test.done();
+        },
+
         testFoldl: function(test) {
             test.expect(1);
             test.strictEqual(-8, sloth.ify([1, 2, 3, 4])
