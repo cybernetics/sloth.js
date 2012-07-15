@@ -565,7 +565,7 @@
                 // This is a lazy, composable operation.
                 //
                 //     > sloth.ify([1, 2]).product([3, 4]).force();
-                //     [ [ 1, 3 ], [ 2, 3 ], [ 1, 4 ], [ 2, 4 ] ]
+                //     [ [ 1, 3 ], [ 1, 4 ], [ 2, 3 ], [ 2, 4 ] ]
                 product: function() {
                     var _this = this;
                     var iters = Array.prototype.slice.call(arguments);
