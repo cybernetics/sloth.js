@@ -598,10 +598,10 @@
             test.done();
         },
 
-        testSkip: function(test) {
+        testDrop: function(test) {
             test.expect(4);
             var iter = sloth.ify((function() { var n = 1; return function() { return n++; }; })())
-                .skip(4)
+                .drop(4)
                 .next;
             test.strictEqual(5, iter());
             test.strictEqual(6, iter());
@@ -627,10 +627,10 @@
             test.done();
         },
 
-        testSkipWhile: function(test) {
+        testDropWhile: function(test) {
             test.expect(5);
             var iter = sloth.ify([4, 5, 6, 7, 4])
-                .skipWhile(function(x) { return x < 5 })
+                .dropWhile(function(x) { return x < 5 })
                 .next;
             test.strictEqual(5, iter());
             test.strictEqual(6, iter());
@@ -675,8 +675,8 @@
             var iter = sloth.ify([1, 2])
                 .product([3, 4]).next;
             test.deepEqual([1, 3], iter());
-            test.deepEqual([2, 3], iter());
             test.deepEqual([1, 4], iter());
+            test.deepEqual([2, 3], iter());
             test.deepEqual([2, 4], iter());
             try {
                 iter();
@@ -686,6 +686,25 @@
             test.done();
         },
 
+        /*testProduct3: function(test) {
+            test.expect(5);
+            var iter = sloth.ify([1, 2])
+                .product([3, 4], [5, 6]).next;
+            test.deepEqual([1, 3, 5], iter());
+            test.deepEqual([1, 3, 6], iter());
+            test.deepEqual([1, 4, 5], iter());
+            test.deepEqual([1, 4, 6], iter());
+            test.deepEqual([2, 3, 5], iter());
+            test.deepEqual([2, 3, 6], iter());
+            test.deepEqual([2, 4, 5], iter());
+            test.deepEqual([2, 4, 6], iter());
+            try {
+                iter();
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+            test.done();
+        },*/
 
         testTee: function(test) {
             test.expect(10);
@@ -703,6 +722,46 @@
             }
 
             var iter = iters[1].next;
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter()
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+
+            test.done();
+        },
+
+        testTee3: function(test) {
+            test.expect(15);
+            var iters = sloth.ify([1, 2, 3, 4]).tee(3);
+
+            var iter = iters[0].next;
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter()
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+
+            var iter = iters[1].next;
+            test.strictEqual(1, iter());
+            test.strictEqual(2, iter());
+            test.strictEqual(3, iter());
+            test.strictEqual(4, iter());
+            try {
+                iter()
+            } catch(e) {
+                test.strictEqual(sloth.StopIteration, e);
+            }
+
+            var iter = iters[2].next;
             test.strictEqual(1, iter());
             test.strictEqual(2, iter());
             test.strictEqual(3, iter());

@@ -244,7 +244,7 @@
                     });
                 },
 
-                // ## Taking and skipping
+                // ## Taking and dropping
 
                 // ### take `take(n)`
                 //
@@ -265,16 +265,16 @@
                     });
                 },
 
-                // ### skip `skip(n)`
+                // ### drop `drop(n)`
                 //
-                // `skip` yields a sequence without the first `n` elements of
+                // `drop` yields a sequence without the first `n` elements of
                 // the original sequence.
                 //
                 // This is a lazy, composable operation.
                 //
-                //     > sloth.ify([1, 2, 3]).skip(2).force();
+                //     > sloth.ify([1, 2, 3]).drop(2).force();
                 //     [ 3 ]
-                skip: function(n) {
+                drop: function(n) {
                     var _this = this;
 
                     return new sloth.Slothified(function() {
@@ -310,18 +310,18 @@
                     });
                 },
 
-                // ### skipWhile `skipWhile(f)`
+                // ### dropWhile `dropWhile(f)`
                 //
-                // `skipWhile` yields a sequence without the first
+                // `dropWhile` yields a sequence without the first
                 // contiguous sequence of elements that fulfill the predicate
                 // `f`.
                 //
                 // This is a lazy, composable operation.
                 //
                 //     > sloth.ify([1, 2, 3, 1, 2, 3]).
-                //     ... skipWhile(function(x) { return x < 3; }).force();
+                //     ... dropWhile(function(x) { return x < 3; }).force();
                 //     [ 3, 1, 2, 3 ]
-                skipWhile: function(f) {
+                dropWhile: function(f) {
                     var _this = this;
 
                     var value;
@@ -418,20 +418,20 @@
 
                     return new sloth.Slothified(function() {
                         var value;
-                        var skip;
+                        var drop;
                         var i;
 
                         for(;;) {
                             value = _this.next();
-                            skip = false;
+                            drop = false;
 
                             for(i = 0; i < seen.length; ++i) {
                                 if(f(seen[i], value)) {
-                                    skip = true;
+                                    drop = true;
                                     break;
                                 }
                             }
-                            if(!skip) return value;
+                            if(!drop) return value;
                         }
                     });
                 },
@@ -465,7 +465,7 @@
 
                     return new sloth.Slothified(function() {
                         var value;
-                        var skip;
+                        var drop;
                         var i;
 
                         for(;;) {
@@ -477,14 +477,14 @@
                                 throw sloth.StopIteration;
                             }
 
-                            skip = false;
+                            drop = false;
                             for(i = 0; i < seen.length; ++i) {
                                 if(f(seen[i], value)) {
-                                    skip = true;
+                                    drop = true;
                                     break;
                                 }
                             }
-                            if(!skip) return value;
+                            if(!drop) return value;
                         }
                     });
                 },
@@ -562,40 +562,49 @@
                 //
                 // This will completely drain all iterators.
                 //
-                // This is a strict, composable operation (until someone
-                // figures out a lazy version).
+                // This is a lazy, composable operation.
                 //
                 //     > sloth.ify([1, 2]).product([3, 4]).force();
                 //     [ [ 1, 3 ], [ 2, 3 ], [ 1, 4 ], [ 2, 4 ] ]
                 product: function() {
-                    var arrays = Array.prototype.slice.call(arguments);
-                    arrays.unshift(this);
-                    var i;
+                    var _this = this;
+                    var iters = Array.prototype.slice.call(arguments);
+                    if(iters.length === 0) return this;
 
-                    for(i = 0; i < arrays.length; ++i) {
-                        arrays[i] = sloth.ify(arrays[i]).force();
-                    }
+                    var ysIter = sloth.ify(iters.shift()).next;
 
-                    // The following code is downright disgusting, so
-                    // annotations will be provided in the form of Haskell
-                    // code.
-                    //
-                    //     product arrays = foldl f [[]] arrays
-                    return new sloth.Slothified(sloth.iterArray(new sloth.Slothified(sloth.iterArray(arrays)).foldl(function(accs, xs) {
-                        //         where f accs xs = foldl (g accs) [] xs
-                        return new sloth.Slothified(sloth.iterArray(xs)).foldl(function(acc, x) {
-                            //               g accs acc x = acc ++ (zs x accs)
-                            return new sloth.Slothified(sloth.iterArray(acc)).concat(
-                                //               zs x = map (h x) accs
-                                sloth.iterArray(new sloth.Slothified(sloth.iterArray(accs)).map(function(ys) {
-                                    //               h x ys = ys ++ [x]
-                                    return new sloth.Slothified(sloth.iterArray(ys))
-                                        .concat(sloth.iterArray([x]))
-                                        .force();
-                                }).force())
-                            ).force();
-                        }, []);
-                    }, [[]])));
+                    var x = _this.next();
+
+                    var ys = [];
+                    var ysEnd = false;
+                    var yPosition = -1;
+
+                    return sloth.Slothified.prototype.product.apply(new sloth.Slothified(function() {
+                        var y;
+
+                        // If our `ys` is not full yet, then we can yield
+                        // things from the second iterable.
+                        if(!ysEnd) {
+                            try {
+                                y = ysIter();
+                                ys.push(y);
+                            } catch(e) {
+                                if(e !== sloth.StopIteration) throw e;
+                                // We've filled our `ys` already, so we can
+                                // mark our `ysEnd` as true.
+                                ysEnd = true;
+                            }
+                        }
+
+                        yPosition++;
+
+                        if(yPosition >= ys.length) {
+                            x = _this.next();
+                            yPosition = 0;
+                        }
+
+                        return [x, ys[yPosition]];
+                    }), iters);
                 },
 
                 // ### cycle `cycle()`
@@ -648,16 +657,16 @@
 
                     return new sloth.Slothified(function() {
                         var value;
-                        var skip;
+                        var drop;
                         var i;
 
                         for(;;) {
                             value = _this.next();
-                            skip = false;
+                            drop = false;
                             for(i = 0; i < seen.length; ++i) {
-                                if(f(seen[i], value)) skip = true;
+                                if(f(seen[i], value)) drop = true;
                             }
-                            if(skip) continue;
+                            if(drop) continue;
                             seen.push(value);
                             return value;
                         }
@@ -843,9 +852,9 @@
                     });
                 },
 
-                // ### tee `tee()`
+                // ### tee `tee(n=2)`
                 //
-                // `tee` splits the sequence into two independent sequence
+                // `tee` splits the sequence into `n` independent sequence
                 // iterators.
                 //
                 // This may allocate a large amount of additional storage, and
@@ -860,29 +869,39 @@
                 //     [ 1, 2, 3, 4, 5 ]
                 //     > iters[1].force();
                 //     [ 1, 2, 3, 4, 5 ]
-                tee: function() {
-                    var _this = this;
+                tee: function(n) {
+                    if(typeof n === "undefined") n = 2;
 
-                    var left = [];
-                    var right = [];
+                    var _this = this;
+                    var i;
+
+                    var queues = [];
+                    for(i = 0; i < n; ++i) {
+                        queues.push([]);
+                    }
 
                     var makeIter = function(queue) {
                         return function() {
                             var value;
 
-                            if(!queue.length) {
+                            if(queue.length === 0) {
                                 value = _this.next();
 
-                                left.unshift(value);
-                                right.unshift(value);
+                                for(i = 0; i < n; ++i) {
+                                    queues[i].unshift(value);
+                                }
                             }
 
                             return queue.pop();
                         };
                     };
 
-                    return [sloth.ify(makeIter(left)),
-                            sloth.ify(makeIter(right))];
+                    var iters = [];
+                    for(i = 0; i < n; ++i) {
+                        iters.push(sloth.ify(makeIter(queues[i])));
+                    }
+
+                    return iters;
                 },
 
                 // ### zip `zip(ys, ...)`
