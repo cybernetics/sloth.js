@@ -686,8 +686,8 @@
             test.done();
         },
 
-        /*testProduct3: function(test) {
-            test.expect(5);
+        testProduct3: function(test) {
+            test.expect(9);
             var iter = sloth.ify([1, 2])
                 .product([3, 4], [5, 6]).next;
             test.deepEqual([1, 3, 5], iter());
@@ -704,7 +704,7 @@
                 test.strictEqual(sloth.StopIteration, e);
             }
             test.done();
-        },*/
+        },
 
         testTee: function(test) {
             test.expect(10);

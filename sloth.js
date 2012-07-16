@@ -567,44 +567,57 @@
                 //     > sloth.ify([1, 2]).product([3, 4]).force();
                 //     [ [ 1, 3 ], [ 1, 4 ], [ 2, 3 ], [ 2, 4 ] ]
                 product: function() {
-                    var _this = this;
                     var iters = Array.prototype.slice.call(arguments);
-                    if(iters.length === 0) return this;
+                    var i;
 
-                    var ysIter = sloth.ify(iters.shift()).next;
+                    for(i = 0; i < iters.length; ++i) {
+                        iters[i] = sloth.ify(iters[i]).next;
+                    }
 
-                    var x = _this.next();
+                    var makeProductIter = function(isFirst) {
+                        var _this = this;
 
-                    var ys = [];
-                    var ysEnd = false;
-                    var yPosition = -1;
+                        var iters = Array.prototype.slice.call(arguments, 1);
+                        if(iters.length === 0) return this;
 
-                    return sloth.Slothified.prototype.product.apply(new sloth.Slothified(function() {
-                        var y;
+                        var x = this.next();
+                        var ysIter = iters.shift();
 
-                        // If our `ys` is not full yet, then we can yield
-                        // things from the second iterable.
-                        if(!ysEnd) {
-                            try {
-                                y = ysIter();
-                                ys.push(y);
-                            } catch(e) {
-                                if(e !== sloth.StopIteration) throw e;
-                                // We've filled our `ys` already, so we can
-                                // mark our `ysEnd` as true.
-                                ysEnd = true;
+                        var ys = [];
+                        var ysEnd = false;
+                        var yPosition = -1;
+
+                        return makeProductIter.apply(new sloth.Slothified(function() {
+                            var y;
+
+                            // If our `ys` is not full yet, then we can yield
+                            // things from the second iterable.
+                            if(!ysEnd) {
+                                try {
+                                    y = ysIter();
+                                    ys.push(y);
+                                } catch(e) {
+                                    if(e !== sloth.StopIteration) throw e;
+                                    // We've filled our `ys` already, so we can
+                                    // mark our `ysEnd` as true.
+                                    ysEnd = true;
+                                }
                             }
-                        }
 
-                        yPosition++;
+                            yPosition++;
 
-                        if(yPosition >= ys.length) {
-                            x = _this.next();
-                            yPosition = 0;
-                        }
+                            if(yPosition >= ys.length) {
+                                x = _this.next();
+                                yPosition = 0;
+                            }
 
-                        return [x, ys[yPosition]];
-                    }), iters);
+                            return isFirst ?
+                                [x, ys[yPosition]] :
+                                x.concat(ys[yPosition]);
+                        }), [false].concat(iters));
+                    };
+
+                    return makeProductIter.apply(this, [true].concat(iters));
                 },
 
                 // ### cycle `cycle()`
