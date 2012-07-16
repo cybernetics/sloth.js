@@ -1,5 +1,5 @@
 docs: sloth.js
-	node_modules/.bin/owldoc docs.md > index.html
+	node_modules/.bin/owldoc README.md > index.html
 
 all: docs
 
