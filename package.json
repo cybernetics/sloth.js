@@ -1,6 +1,6 @@
 {
     "name": "sloth",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "author": "Tony Young <tony@rfw.name>",
     "description": "A lazy iterator framework for JavaScript.",
     "main": "./sloth",
@@ -10,7 +10,7 @@
     },
     "devDependencies": {
         "nodeunit": "0.7.x",
-        "docco": "x.x.x"
+        "owldoc": "x.x.x"
     },
     "license": "MIT"
 }

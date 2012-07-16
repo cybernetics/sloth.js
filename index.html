@@ -1,305 +1,767 @@
-<!DOCTYPE html>  <html> <head>   <title>sloth.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> <script type="text/javascript" src="sloth.js"></script></head> <body><a href="https://github.com/rfw/sloth.js"><img style="position: fixed; top: 0; right: 0; border: 0; z-index: 1000" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a><div style="width: 100%; background: #fff; border-bottom: 1px solid #ccc; z-index: 500;"><div style="margin-left: 16px; color: #999;">sloth.js documentation | Navigation: <a href="tests.html">Tests</a></div></div>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               sloth.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="s2">&quot;use strict&quot;</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p><em>The lazy JavaScript iterator library.</em></p>
+<!doctype html>
+<html>
+    <head>
+        <title>sloth.js</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            /* shamelessly stolen from http://jashkenas.github.com/docco/ */
+            body {
+                font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+                font-size: 15px;
+                line-height: 22px;
+                color: #252519;
+                margin: 0 auto;
+                padding: 0;
 
-<p><code>sloth.js</code> is a JavaScript library for working with lazy iterators,
-providing a way to create, compose and perform various other operations
-on them --- forming a composable algebra of operations on iterators.</p>
+                width: 960px;
+            }
 
-<p><code>sloth.js</code> will be slower than conventional operations for short
-operations (though sometimes outperforms native implementations for some
-inexplicable reason), but where it shines is consuming large amounts of
-data along a pipeline, e.g. combining <code>map</code>, <code>filter</code> and <code>foldl</code>
-operations. This is because it doesn't allocate any space before actual
-iteration.</p>
+            .toc {
+                float: left;
+                margin: 10px 0;
+                padding: 0;
+                padding-top: 20px;
+                width: 300px;
+            }
+
+            .toc ul {
+                padding: 0;
+                margin-left: 20px;
+            }
+
+            .toc li {
+                padding: 0;
+            }
+
+            .toc li.title {
+                font-weight: bold;
+                list-style: none;
+                margin-left: -20px;
+            }
+
+            .content {
+                float: left;
+                margin: 10px 0;
+                padding-top: 20px;
+                width: 620px;
+            }
+
+            a {
+                color: #261a3b;
+            }
+
+            a:visited {
+                color: #261a3b;
+            }
+
+            p {
+                margin: 0 0 15px 0;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                margin: 15px 0 15px 0;
+            }
+
+            pre, tt, code {
+                font-size: 12px;
+                line-height: 18px;
+                font-family: Monaco, Consolas, "Lucida Console", monospace;
+                margin: 0;
+                padding: 0;
+            }
+
+            .footer {
+                clear: both;
+                padding: 20px 0;
+                text-align: right;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+    <ul class="toc">
+        <li class="title">Table of Contents</li>
+
+
+    
+        <li>
+        
+            <a href="#slothjs">sloth.js</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#slothify">sloth.ify</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#Terminology">Terminology</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#Lazy">Lazy</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Strict">Strict</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Composable">Composable</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Non-composable">Non-composable</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Maps-filters-and-folds">Maps, filters and folds</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#map">map</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#filter">filter</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#foldl">foldl</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#foldr">foldr</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Quantification">Quantification</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#all">all</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#any">any</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Maxima-and-minima">Maxima and minima</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#max">max</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#min">min</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Taking-and-dropping">Taking and dropping</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#take">take</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#drop">drop</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#takeWhile">takeWhile</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#dropWhile">dropWhile</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Set-operations">Set operations</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#union">union</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#intersect">intersect</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#difference">difference</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#symmetricDifference">symmetricDifference</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Sequence-utilities">Sequence utilities</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#each">each</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#concat">concat</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#product">product</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#cycle">cycle</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#nub">nub</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#enumerate">enumerate</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#reverse">reverse</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#sort">sort</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#group">group</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#tee">tee</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#zip">zip</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#force">force</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Advanced-features">Advanced features</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Additional-slothifications">Additional slothifications</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#range">range</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#repeat">repeat</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Iterators">Iterators</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#iter">iter</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#iterArray">iterArray</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#iterString">iterString</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#iterObject">iterObject</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#iterNextable">iterNextable</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+        <li>
+        
+            <a href="#StopIteration">StopIteration</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#Utility-functions">Utility functions</a>
+        
+        
+            <ul>
+                
+    
+        <li>
+        
+            <a href="#id">id</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#cmp">cmp</a>
+        
+        
+        </li>
+    
+        <li>
+        
+            <a href="#eq">eq</a>
+        
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+
+            </ul>
+        
+        </li>
+    
+
+    </ul>
+    <div class="content">
+<p><a href="https://github.com/rfw/sloth.js"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"/></a></p>
+
+<h1 id="slothjs">sloth.js</h1>
+
+<p><img src="logo.png" alt="sloth.js" title=""/></p>
+
+<p><em>The lazy JavaScript iterator library.</em></p>
+
+<p><code>sloth.js</code> is a JavaScript library for working with lazy iterators, providing a
+way to create, compose and perform various other operations on them — forming a
+composable algebra of operations on iterators.</p>
+
+<p><code>sloth.js</code> will be slower than conventional operations for short operations
+(though sometimes outperforms native implementations for some inexplicable
+reason), but where it shines is consuming large amounts of data along a
+pipeline, e.g. combining <code>map</code>, <code>filter</code> and <code>foldl</code> operations. This is 
+ecause it doesn't allocate any space before actual iteration.</p>
 
 <p>Inspired by Python's <code>itertools</code> module, Haskell's lazy list facilities
 and Jeremy Ashkenas's Underscore.js.</p>
 
-<p><code>sloth.js</code> is freely distributable under the terms of the MIT license.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">sloth</span> <span class="o">=</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>sloth.ify <code>sloth.ify(xs)</code></h2>
+<p><code>sloth.js</code> is freely distributable under the terms of the MIT license.</p>
 
-<p><code>sloth.ify</code> a sequence <code>xs</code>, returning an object usable with
-<code>sloth.js</code> operations. Slothification is an idempotent operation,
-meaning it can be used on a slothified variable multiple times
-without any issue.</p>
+<h2 id="slothify"><span class="heading">sloth.ify</span> <code>sloth.ify(xs)</code></h2>
 
-<h3>Terminology</h3>
+<p><code>sloth.ify</code> a sequence <code>xs</code>, returning an object usable with <code>sloth.js</code>
+operations. Slothification is an idempotent operation, meaning it can be used
+on a slothified variable multiple times without any issue.</p>
 
-<h4>Lazy</h4>
+<h3 id="Terminology">Terminology</h3>
 
-<p>Lazy operations are run as the sequence is iterated, rather than
-immediately when the function is called.</p>
+<h4 id="Lazy">Lazy</h4>
 
-<h4>Strict</h4>
+<p>Lazy operations are run as the sequence is iterated, rather than immediately
+when the function is called.</p>
 
-<p>Strict operations run as soon as the function is called, allocating
-space for it immediately. You may wish to run some strict operations
-(e.g. <code>reverse</code> and <code>sort</code>) after forcing, as their in-place
-native equivalents will be faster.</p>
+<h4 id="Strict">Strict</h4>
 
-<h4>Composable</h4>
+<p>Strict operations run as soon as the function is called, allocating space for
+it immediately. You may wish to run some strict operations (e.g. <code>reverse</code> and
+<code>sort</code>) after forcing, as their in-place native equivalents will be faster.</p>
 
-<p>Composable operations can have successive operations invoked on
-them, e.g. <code>map().map().filter().nub()</code>.</p>
+<h4 id="Composable">Composable</h4>
 
-<h4>Non-composable</h4>
+<p>Composable operations can have successive operations invoked on them, e.g.
+<code>map().map().filter().nub()</code>.</p>
 
-<p>Non-composable operations are found at the end of a <code>sloth.ify</code>ed
-chain, usually culminating in a result.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">ify</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xs</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span><span class="p">(</span><span class="nx">xs</span><span class="p">.</span><span class="nx">slothified</span><span class="p">)</span> <span class="k">return</span> <span class="nx">xs</span><span class="p">;</span>
-            <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="nx">sloth</span><span class="p">.</span><span class="nx">iter</span><span class="p">(</span><span class="nx">xs</span><span class="p">));</span>
-        <span class="p">},</span>
+<h4 id="Non-composable">Non-composable</h4>
 
-        <span class="nx">Slothified</span><span class="o">:</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">Slothified</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">iter</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">this</span><span class="p">.</span><span class="nx">next</span> <span class="o">=</span> <span class="nx">iter</span><span class="p">;</span>
-            <span class="p">};</span>
+<p>Non-composable operations are found at the end of a <code>sloth.ify</code>ed chain,
+usually culminating in a result.</p>
 
-            <span class="nx">Slothified</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Mark the object as a <code>sloth.ify</code>ed.</p>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">slothified</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>Maps, filters and folds</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h3>map <code>map(f)</code></h3>
+<h2 id="Maps-filters-and-folds">Maps, filters and folds</h2>
 
-<p><code>map</code> applies a function <code>f</code> across all elements of a
-sequence.</p>
+<h3 id="map"><span class="heading">map</span> <code>map(f)</code></h3>
+
+<p><code>map</code> applies a function <code>f</code> across all elements of a sequence.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).
 ... map(function(x) { return x + 1; }).force();
 [ 2, 3, 4 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">map</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">return</span> <span class="nx">f</span><span class="p">(</span><span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">());</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h3>filter <code>filter(f)</code></h3>
+<h3 id="filter"><span class="heading">filter</span> <code>filter(f)</code></h3>
 
-<p><code>filter</code> selects elements from a sequence that are <code>true</code>
-when the predicate <code>f</code> is applied to them.</p>
+<p><code>filter</code> selects elements from a sequence that are <code>true</code> when the predicate
+<code>f</code> is applied to them.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).
 ... filter(function(x) { return x &gt; 2; }).force();
 [ 3 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">filter</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="nx">f</span><span class="p">(</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">()));</span>
-                        <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h3>foldl <code>foldl(f, acc=this.next())</code></h3>
+<h3 id="foldl"><span class="heading">foldl</span> <code>foldl(f, acc=this.next())</code></h3>
 
-<p><code>foldl</code> is an implementation of the left-fold operation,
-also known as a left-reduce or inject.</p>
+<p><code>foldl</code> is an implementation of the left-fold operation, also known as a
+left-reduce or inject.</p>
 
 <p>This is a strict, non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).
 ... foldl(function(acc, x) { return acc + x; }, 1);
 [ 7 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">foldl</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">acc</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="nx">acc</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+</code></pre>
 
-                    <span class="k">this</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">acc</span> <span class="o">=</span> <span class="nx">f</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
-                    <span class="p">});</span>
-                    <span class="k">return</span> <span class="nx">acc</span><span class="p">;</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h3>foldr <code>foldr(f, acc=this.next())</code></h3>
+<h3 id="foldr"><span class="heading">foldr</span> <code>foldr(f, acc=this.next())</code></h3>
 
-<p><code>foldr</code> is an implementation of the right-fold operation,
-the reverse analog of <code>foldl</code> operation.</p>
+<p><code>foldr</code> is an implementation of the right-fold operation, the reverse analog of
+the <code>foldl</code> operation.</p>
 
-<p>This operation may be slow due the fact the entire list must
-first be reversed.</p>
+<p>This operation may be slow due the fact the entire list must first be reversed.</p>
 
 <p>This is a strict, non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).
 ... foldr(function(x, acc) { return acc + x; }, 1);
 [ 7 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">foldr</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">acc</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">reverseIter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">)</span>
-                        <span class="p">.</span><span class="nx">reverse</span><span class="p">()</span>
-                        <span class="p">.</span><span class="nx">next</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">if</span><span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="nx">acc</span> <span class="o">=</span> <span class="nx">reverseIter</span><span class="p">();</span>
+<h2 id="Quantification">Quantification</h2>
 
-                    <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="nx">reverseIter</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">acc</span> <span class="o">=</span> <span class="nx">f</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">acc</span><span class="p">);</span>
-                    <span class="p">});</span>
-                    <span class="k">return</span> <span class="nx">acc</span><span class="p">;</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h2>Quantification</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h3>all <code>all(f=sloth.id)</code></h3>
+<h3 id="all"><span class="heading">all</span> <code>all(f=</code><a href="#id"><code>sloth.id</code></a><code>)</code></h3>
 
-<p><code>all</code> checks if all values in the sequence are truthy or
-fulfill the predicate <code>f</code> (universal quantification).</p>
+<p><code>all</code> checks if all values in the sequence are truthy or fulfill the predicate
+<code>f</code> (universal quantification).</p>
 
 <p>This is a partially strict non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([true, true, false]).all()
 false
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">all</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
-                    <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                        <span class="k">try</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
-                            <span class="k">break</span><span class="p">;</span>
-                        <span class="p">}</span>
-                        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">f</span><span class="p">(</span><span class="nx">value</span><span class="p">))</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-                    <span class="p">}</span>
-                    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <h3>any <code>any(f=sloth.id)</code></h3>
+<h3 id="any"><span class="heading">any</span> <code>any(f=</code><a href="#id"><code>sloth.id</code></a><code>)</code></h3>
 
-<p><code>any</code> checks if any values in the sequence are truthy or
-fulfill the predicate <code>f</code> (existential quantification).</p>
+<p><code>any</code> checks if any values in the sequence are truthy or fulfill the predicate
+<code>f</code> (existential quantification).</p>
 
 <p>This is a partially strict non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([true, true, false]).any()
 true
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">any</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
-                    <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                        <span class="k">try</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
-                            <span class="k">break</span><span class="p">;</span>
-                        <span class="p">}</span>
-                        <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">value</span><span class="p">))</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-                    <span class="p">}</span>
-                    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <h2>Maxima and minima</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <h3>max <code>max(f=sloth.cmp)</code></h3>
+<h2 id="Maxima-and-minima">Maxima and minima</h2>
 
-<p><code>max</code> returns the maximum value of the sequence using the
-comparison function <code>f</code>.</p>
+<h3 id="max"><span class="heading">max</span> <code>max(f=</code><a href="#cmp"><code>sloth.cmp</code></a><code>)</code></h3>
 
-<p>If you're looking for the maximum of an array, it is much
-more efficient to use <code>Math.max.apply(Math, array)</code> (up to
-40x(!!) faster).</p>
+<p><code>max</code> returns the maximum value of the sequence using the comparison function
+<code>f</code>.</p>
+
+<p>If you're looking for the maximum of an array, it is much more efficient to use
+<code>Math.max.apply(Math, array)</code> (up to 40x(!!) faster).</p>
 
 <p>This is a strict, non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([3, 4, 1]).max()
 4
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">max</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">cmp</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">foldl</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="k">return</span> <span class="nx">f</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="nx">acc</span> <span class="o">:</span> <span class="nx">x</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h3>min <code>min(f=sloth.cmp)</code></h3>
+<h3 id="min"><span class="heading">min</span> <code>min(f=</code><a href="#cmp"><code>sloth.cmp</code></a><code>)</code></h3>
 
-<p><code>min</code> returns the minimum value of the sequence using the
-comparison function <code>f</code>.</p>
+<p><code>min</code> returns the minimum value of the sequence using the comparison function
+<code>f</code>.</p>
 
-<p>If you're looking for the minimum of an array, it is much
-more efficient to use <code>Math.min.apply(Math, array)</code> (up to
-40x(!!) faster).</p>
+<p>If you're looking for the minimum of an array, it is much more efficient to use
+<code>Math.min.apply(Math, array)</code> (up to 40x(!!) faster).</p>
 
 <p>This is a strict, non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([3, 4, 1]).min()
 1
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">min</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">cmp</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">foldl</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="k">return</span> <span class="nx">f</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="nx">acc</span> <span class="o">:</span> <span class="nx">x</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h2>Taking and dropping</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <h3>take <code>take(n)</code></h3>
+<h2 id="Taking-and-dropping">Taking and dropping</h2>
 
-<p><code>take</code> yields a sequence with only the first <code>n</code> elements of
-the original sequence.</p>
+<h3 id="take"><span class="heading">take</span> <code>take(n)</code></h3>
+
+<p><code>take</code> yields a sequence with only the first <code>n</code> elements of the original
+sequence.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).take(2).force();
 [ 1, 2 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">take</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                        <span class="nx">n</span><span class="o">--</span><span class="p">;</span>
-                        <span class="k">return</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <h3>drop <code>drop(n)</code></h3>
+<h3 id="drop"><span class="heading">drop</span> <code>drop(n)</code></h3>
 
-<p><code>drop</code> yields a sequence without the first <code>n</code> elements of
-the original sequence.</p>
+<p><code>drop</code> yields a sequence without the first <code>n</code> elements of the original
+sequence.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).drop(2).force();
 [ 3 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">drop</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">while</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                            <span class="nx">n</span><span class="o">--</span><span class="p">;</span>
-                        <span class="p">}</span>
-                        <span class="k">return</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <h3>takeWhile <code>takeWhile(f)</code></h3>
+<h3 id="takeWhile"><span class="heading">takeWhile</span> <code>takeWhile(f)</code></h3>
 
-<p><code>takeWhile</code> yields a sequence with only the first
-contiguous sequence of elements that fulfill the predicate
-<code>f</code>.</p>
+<p><code>takeWhile</code> yields a sequence with only the first contiguous sequence of
+elements that fulfill the predicate <code>f</code>.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3, 1, 2, 3]).
 ... takeWhile(function(x) { return x &lt; 3; }).force();
 [ 1, 2 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">takeWhile</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">ended</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+<h3 id="dropWhile"><span class="heading">dropWhile</span> <code>dropWhile(f)</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="nx">ended</span> <span class="o">=</span> <span class="o">!</span><span class="nx">f</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                        <span class="k">if</span><span class="p">(</span><span class="nx">ended</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                        <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <h3>dropWhile <code>dropWhile(f)</code></h3>
-
-<p><code>dropWhile</code> yields a sequence without the first
-contiguous sequence of elements that fulfill the predicate
-<code>f</code>.</p>
+<p><code>dropWhile</code> yields a sequence without the first contiguous sequence of elements
+that fulfill the predicate <code>f</code>.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3, 1, 2, 3]).
 ... dropWhile(function(x) { return x &lt; 3; }).force();
 [ 3, 1, 2, 3 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">dropWhile</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                    <span class="k">while</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">()));</span>
+<h2 id="Set-operations">Set operations</h2>
 
-                    <span class="kd">var</span> <span class="nx">firstTaken</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+<h3 id="union"><span class="heading">union</span> <code>union(ys, f=</code><a href="#eq"><code>sloth.eq</code></a><code>)</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">if</span><span class="p">(</span><span class="nx">firstTaken</span><span class="p">)</span> <span class="k">return</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="nx">firstTaken</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                        <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-21">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-21">&#182;</a>               </div>               <h2>Set operations</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <h3>union <code>union(ys, f=sloth.eq)</code></h3>
-
-<p><code>union</code> yields a sequence with only the unique elements from
-this sequence and <code>ys</code>, using the given predicate <code>f</code> for
-equality.</p>
+<p><code>union</code> yields a sequence with only the unique elements from this sequence and
+<code>ys</code>, using the given predicate <code>f</code> for equality.</p>
 
 <p>This will drain the <code>ys</code> iterator.</p>
 
@@ -309,143 +771,67 @@ equality.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3, 3]).union([3, 4, 4, 5]).force();
 [ 1, 2, 3, 4, 5 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">union</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ys</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">eq</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">ys</span><span class="p">).</span><span class="nx">nub</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <h3>intersect <code>intersect(ys, f=sloth.eq)</code></h3>
+<h3 id="intersect"><span class="heading">intersect</span> <code>intersect(ys, f=</code><a href="#eq"><code>sloth.eq</code></a><code>)</code></h3>
 
-<p><code>intersect</code> yields a sequence with only the unique elements
-present in this sequence and <code>ys</code>, using the given predicate
-<code>f</code> for equality.</p>
+<p><code>intersect</code> yields a sequence with only the unique elements present in this
+sequence and <code>ys</code>, using the given predicate <code>f</code> for equality.</p>
 
 <p>This will drain the <code>ys</code> iterator.</p>
 
 <p>Again, this can be slow due to the use of <code>nub</code>.</p>
 
-<p>This is a semi-strict composable operation, as it requires
-the first iterator to be non-infinite.</p>
+<p>This is a semi-strict composable operation, as it requires the first iterator
+to be non-infinite.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3, 3]).intersect([3, 4, 4, 5]).force();
 [ 3 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">intersect</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ys</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">eq</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">seen</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">nub</span><span class="p">(</span><span class="nx">f</span><span class="p">).</span><span class="nx">force</span><span class="p">();</span>
-                    <span class="kd">var</span> <span class="nx">ysNubbed</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">ys</span><span class="p">).</span><span class="nx">nub</span><span class="p">().</span><span class="nx">next</span><span class="p">;</span>
+<h3 id="difference"><span class="heading">difference</span> <code>difference(ys, f=</code><a href="#eq"><code>sloth.eq</code></a><code>)</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-
-                        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="nx">ysNubbed</span><span class="p">();</span>
-
-                            <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">seen</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">seen</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                            <span class="p">}</span>
-                        <span class="p">}</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <h3>difference <code>difference(ys, f=sloth.eq)</code></h3>
-
-<p><code>difference</code> yields a sequence with the elements of sequence
-<code>ys</code> removed from this sequence, using the given predicate
-<code>f</code> for equality.</p>
+<p><code>difference</code> yields a sequence with the elements of sequence <code>ys</code> removed from
+this sequence, using the given predicate <code>f</code> for equality.</p>
 
 <p>This will drain the <code>ys</code> iterator.</p>
 
-<p>This does not return only unique elements, but the resulting
-sequence can be <code>nub()</code>ed.</p>
+<p>This does not return only unique elements, but the resulting sequence can be
+<code>nub()</code>ed.</p>
 
-<p>This is a semi-strict composable operation, as it requires
-the second iterator to be non-infinite.</p>
+<p>This is a semi-strict composable operation, as it requires the second iterator
+to be non-infinite.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3, 3]).difference([3, 4, 4, 5]).force();
 [ 1, 2 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">difference</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ys</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">eq</span><span class="p">;</span>
+<h3 id="symmetricDifference"><span class="heading">symmetricDifference</span> <code>symmetricDifference(ys, f=</code><a href="#eq"><code>sloth.eq</code></a><code>)</code></h3>
 
-                    <span class="kd">var</span> <span class="nx">seen</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">ys</span><span class="p">).</span><span class="nx">nub</span><span class="p">().</span><span class="nx">force</span><span class="p">();</span>
-
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">drop</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-
-                        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                            <span class="nx">drop</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-
-                            <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">seen</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">seen</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
-                                    <span class="nx">drop</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                                    <span class="k">break</span><span class="p">;</span>
-                                <span class="p">}</span>
-                            <span class="p">}</span>
-                            <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">drop</span><span class="p">)</span> <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="p">}</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <h3>symmetricDifference <code>symmetricDifference(ys, f=sloth.eq)</code></h3>
-
-<p><code>symmetricDifference</code> yields a sequence of the elements
-present in neither this sequence nor <code>ys</code>, using the given
-predicate <code>f</code> for equality.</p>
+<p><code>symmetricDifference</code> yields a sequence of the elements present in neither this
+sequence nor <code>ys</code>, using the given predicate <code>f</code> for equality.</p>
 
 <p>This will drain the <code>ys</code> iterator.</p>
 
-<p>This does not return only unique elements, but the resulting
-sequence can be <code>nub()</code>ed.</p>
+<p>This does not return only unique elements, but the resulting sequence can be
+<code>nub()</code>ed.</p>
 
 <p>This is a strict, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3, 3]).
 ... symmetricDifference([3, 4, 4, 5]).force();
 [ 1, 2, 4, 4, 5 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">symmetricDifference</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ys</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">eq</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">xsArray</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">force</span><span class="p">().</span><span class="nx">reverse</span><span class="p">();</span>
-                    <span class="kd">var</span> <span class="nx">ysArray</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">ys</span><span class="p">).</span><span class="nx">force</span><span class="p">().</span><span class="nx">reverse</span><span class="p">();</span>
+<h2 id="Sequence-utilities">Sequence utilities</h2>
 
-                    <span class="kd">var</span> <span class="nx">seen</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="nx">sloth</span><span class="p">.</span><span class="nx">iterArray</span><span class="p">(</span><span class="nx">xsArray</span><span class="p">))</span>
-                        <span class="p">.</span><span class="nx">intersect</span><span class="p">(</span><span class="nx">sloth</span><span class="p">.</span><span class="nx">iterArray</span><span class="p">(</span><span class="nx">ysArray</span><span class="p">),</span> <span class="nx">f</span><span class="p">)</span>
-                        <span class="p">.</span><span class="nx">force</span><span class="p">();</span>
+<h3 id="each"><span class="heading">each</span> <code>each(f)</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">drop</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
+<p><code>each</code> acts as a for-each loop and iterates through all elements of the
+sequence, applying the given function <code>f</code> to each. The current index is passed
+as the second parameter to <code>f</code>.</p>
 
-                        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">xsArray</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="nx">value</span> <span class="o">=</span> <span class="nx">xsArray</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
-                            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">ysArray</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="nx">value</span> <span class="o">=</span> <span class="nx">ysArray</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
-                            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                                <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                            <span class="p">}</span>
-
-                            <span class="nx">drop</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-                            <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">seen</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">seen</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
-                                    <span class="nx">drop</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                                    <span class="k">break</span><span class="p">;</span>
-                                <span class="p">}</span>
-                            <span class="p">}</span>
-                            <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">drop</span><span class="p">)</span> <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="p">}</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-26">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-26">&#182;</a>               </div>               <h2>Sequence utilities</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-27">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-27">&#182;</a>               </div>               <h3>each <code>each(f)</code></h3>
-
-<p><code>each</code> acts as a for-each loop and iterates through all
-elements of the sequence, applying the given function <code>f</code> to
-each. The current index is passed as the second parameter to
-<code>f</code>.</p>
-
-<p><code>sloth.StopIteration</code> can be thrown at any time to break out
+<p><a href="#StopIteration"><code>sloth.StopIteration</code></a> can be thrown at any time to break out
 of the loop.</p>
 
 <p>This is a strict, non-composable operation.</p>
@@ -455,20 +841,9 @@ of the loop.</p>
 2 1
 3 2
 3 3
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">each</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                    <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                        <span class="k">try</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
-                            <span class="k">break</span><span class="p">;</span>
-                        <span class="p">}</span>
-                        <span class="nx">f</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">i</span><span class="o">++</span><span class="p">);</span>
-                    <span class="p">}</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-28">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-28">&#182;</a>               </div>               <h3>concat <code>concat(ys)</code></h3>
+<h3 id="concat"><span class="heading">concat</span> <code>concat(ys)</code></h3>
 
 <p><code>concat</code> joins this sequence with <code>ys</code>, end-to-end.</p>
 
@@ -478,30 +853,12 @@ of the loop.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).concat([3, 4, 5]).force();
 [1, 2, 3, 3, 4, 5]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">concat</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ys</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">xsEnd</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-                    <span class="kd">var</span> <span class="nx">ysIter</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">ys</span><span class="p">).</span><span class="nx">next</span><span class="p">;</span>
+<h3 id="product"><span class="heading">product</span> <code>product(ys, ...)</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">xsEnd</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="k">try</span> <span class="p">{</span>
-                                <span class="k">return</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                            <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
-                                <span class="nx">xsEnd</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                                <span class="k">return</span> <span class="nx">ysIter</span><span class="p">();</span>
-                            <span class="p">}</span>
-                        <span class="p">}</span>
-
-                        <span class="k">if</span><span class="p">(</span><span class="nx">xsEnd</span><span class="p">)</span> <span class="k">return</span> <span class="nx">ysIter</span><span class="p">();</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-29">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>               <h3>product <code>product(ys, ...)</code></h3>
-
-<p><code>product</code> yields the Cartesian product of all the sequences
-passed in and this sequence, equivalent to a series of
-nested loops.</p>
+<p><code>product</code> yields the Cartesian product of all the sequences passed in and this
+sequence, equivalent to a series of nested loops.</p>
 
 <p>This will completely drain all iterators.</p>
 
@@ -509,54 +866,9 @@ nested loops.</p>
 
 <pre><code>&gt; sloth.ify([1, 2]).product([3, 4]).force();
 [ [ 1, 3 ], [ 1, 4 ], [ 2, 3 ], [ 2, 4 ] ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">product</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">iters</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">);</span>
-                    <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">iters</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">iters</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">iters</span><span class="p">[</span><span class="nx">i</span><span class="p">]).</span><span class="nx">next</span><span class="p">;</span>
-                    <span class="p">}</span>
-
-                    <span class="kd">var</span> <span class="nx">makeProductIter</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">isFirst</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-
-                        <span class="kd">var</span> <span class="nx">iters</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-                        <span class="k">if</span><span class="p">(</span><span class="nx">iters</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-
-                        <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="kd">var</span> <span class="nx">ysIter</span> <span class="o">=</span> <span class="nx">iters</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-
-                        <span class="kd">var</span> <span class="nx">ys</span> <span class="o">=</span> <span class="p">[];</span>
-                        <span class="kd">var</span> <span class="nx">ysEnd</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">yPosition</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-
-                        <span class="k">return</span> <span class="nx">makeProductIter</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                            <span class="kd">var</span> <span class="nx">y</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-30">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-30">&#182;</a>               </div>               <p>If our <code>ys</code> is not full yet, then we can yield
-things from the second iterable.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">ysEnd</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">try</span> <span class="p">{</span>
-                                    <span class="nx">y</span> <span class="o">=</span> <span class="nx">ysIter</span><span class="p">();</span>
-                                    <span class="nx">ys</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">y</span><span class="p">);</span>
-                                <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                                    <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-31">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-31">&#182;</a>               </div>               <p>We've filled our <code>ys</code> already, so we can
-mark our <code>ysEnd</code> as true.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                    <span class="nx">ysEnd</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                                <span class="p">}</span>
-                            <span class="p">}</span>
-
-                            <span class="nx">yPosition</span><span class="o">++</span><span class="p">;</span>
-
-                            <span class="k">if</span><span class="p">(</span><span class="nx">yPosition</span> <span class="o">&gt;=</span> <span class="nx">ys</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="nx">x</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                                <span class="nx">yPosition</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-                            <span class="p">}</span>
-
-                            <span class="k">return</span> <span class="nx">isFirst</span> <span class="o">?</span>
-                                <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="nx">ys</span><span class="p">[</span><span class="nx">yPosition</span><span class="p">]]</span> <span class="o">:</span>
-                                <span class="nx">x</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">ys</span><span class="p">[</span><span class="nx">yPosition</span><span class="p">]);</span>
-                        <span class="p">}),</span> <span class="p">[</span><span class="kc">false</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">iters</span><span class="p">));</span>
-                    <span class="p">};</span>
-
-                    <span class="k">return</span> <span class="nx">makeProductIter</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="p">[</span><span class="kc">true</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">iters</span><span class="p">));</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-32">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-32">&#182;</a>               </div>               <h3>cycle <code>cycle()</code></h3>
+<h3 id="cycle"><span class="heading">cycle</span> <code>cycle()</code></h3>
 
 <p><code>cycle</code> loops a list around itself infinitely.</p>
 
@@ -564,77 +876,34 @@ mark our <code>ysEnd</code> as true.</p>             </td>             <td class
 
 <pre><code>&gt; sloth.ify([1, 2]).cycle().take(6).force();
 [ 1, 2, 1, 2, 1, 2 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">cycle</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">xs</span> <span class="o">=</span> <span class="p">[];</span>
-                    <span class="kd">var</span> <span class="nx">xsIter</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<h3 id="nub"><span class="heading">nub</span> <code>nub(f=</code><a href="#eq"><code>sloth.eq</code></a><code>)</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
+<p><code>nub</code> removes duplicate elements from the sequence using the given predicate
+<code>f</code> for equality.</p>
 
-                        <span class="k">try</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="p">(</span><span class="nx">xsIter</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">?</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span> <span class="o">:</span> <span class="nx">xsIter</span><span class="p">)();</span>
-                        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
-                            <span class="nx">xsIter</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">iterArray</span><span class="p">(</span><span class="nx">xs</span><span class="p">);</span>
-                            <span class="k">return</span> <span class="nx">xsIter</span><span class="p">();</span>
-                        <span class="p">}</span>
-
-                        <span class="k">if</span><span class="p">(</span><span class="nx">xsIter</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                        <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-33">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-33">&#182;</a>               </div>               <h3>nub <code>nub(f=sloth.eq)</code></h3>
-
-<p><code>nub</code> removes duplicate elements from the sequence using
-the given predicate <code>f</code> for equality.</p>
-
-<p>This is up to 10x slower than Underscore.js's <code>uniq</code>, but is
-more flexible in its operation.</p>
+<p>This is up to 10x slower than Underscore.js's <code>uniq</code>, but is more flexible in
+its operation.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 2, 3, 3]).nub().force();
 [ 1, 2, 3 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">nub</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">eq</span><span class="p">;</span>
-                    <span class="kd">var</span> <span class="nx">seen</span> <span class="o">=</span> <span class="p">[];</span>
+<h3 id="enumerate"><span class="heading">enumerate</span> <code>enumerate()</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">drop</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-
-                        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                            <span class="nx">drop</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-                            <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">seen</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">seen</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="nx">drop</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                            <span class="p">}</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">drop</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
-                            <span class="nx">seen</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                            <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="p">}</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-34">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-34">&#182;</a>               </div>               <h3>enumerate <code>enumerate()</code></h3>
-
-<p><code>enumerate</code> takes each element and places it in an array
-with the index as the first element.</p>
+<p><code>enumerate</code> takes each element and places it in an array with the index as the
+first element.</p>
 
 <p>This is a lazy, composable operaton.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 2, 3, 3]).enumerate().force();
 [ [ 0, 1 ], [ 1, 2 ], [ 2, 2 ], [ 3, 3 ], [ 4, 3 ] ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">enumerate</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">return</span> <span class="p">[</span><span class="nx">i</span><span class="o">++</span><span class="p">,</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">()];</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-35">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-35">&#182;</a>               </div>               <h3>reverse <code>reverse()</code></h3>
+<h3 id="reverse"><span class="heading">reverse</span> <code>reverse()</code></h3>
 
 <p><code>reverse</code> yields the reverse iterator of this sequence.</p>
 
@@ -642,15 +911,9 @@ with the index as the first element.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 2, 3, 3]).reverse().force();
 [ 3, 3, 2, 2, 1 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">reverse</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">array</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">force</span><span class="p">();</span>
-                    <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                        <span class="k">return</span> <span class="nx">array</span><span class="p">[</span><span class="o">--</span><span class="nx">n</span><span class="p">];</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-36">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-36">&#182;</a>               </div>               <h3>sort <code>sort(f=sloth.cmp)</code></h3>
+<h3 id="sort"><span class="heading">sort</span> <code>sort(f=</code><a href="#cmp"><code>sloth.cmp</code></a><code>)</code></h3>
 
 <p><code>sort</code> sorts the sequence using the comparison function <code>f</code>.</p>
 
@@ -658,16 +921,11 @@ with the index as the first element.</p>
 
 <pre><code>&gt; sloth.ify([1, 4, 3, 5, 2]).sort().force();
 [ 1, 2, 3, 4, 5 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">sort</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">cmp</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">array</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">force</span><span class="p">();</span>
-                    <span class="nx">array</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="nx">sloth</span><span class="p">.</span><span class="nx">iterArray</span><span class="p">(</span><span class="nx">array</span><span class="p">));</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-37">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-37">&#182;</a>               </div>               <h3>group <code>group(f=sloth.eq)</code></h3>
+<h3 id="group"><span class="heading">group</span> <code>group(f=</code><a href="#eq"><code>sloth.eq</code></a><code>)</code></h3>
 
-<p><code>group</code> groups the sequence into subsequences using the
-predicate function <code>f</code>.</p>
+<p><code>group</code> groups the sequence into subsequences using the predicate function <code>f</code>.</p>
 
 <p>This is a lazy, composable operation.</p>
 
@@ -675,79 +933,14 @@ predicate function <code>f</code>.</p>
 ... group().
 ... map(function(x) { return x.force() } ).force();
 [ [ 1, 1 ], [ 2 ], [ 3 ], [ 4 ] ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">group</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">f</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">eq</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-38">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-38">&#182;</a>               </div>               <p><code>backCount</code> stores how many queues haven't been made
-iterable yet.</p>             </td>             <td class="code">               <div class="highlight"><pre>                    <span class="kd">var</span> <span class="nx">backCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-39">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-39">&#182;</a>               </div>               <p>The <code>starts</code> array stores the first value that matches
-the given predicate function.</p>             </td>             <td class="code">               <div class="highlight"><pre>                    <span class="kd">var</span> <span class="nx">starts</span> <span class="o">=</span> <span class="p">[];</span></pre></div>             </td>           </tr>                               <tr id="section-40">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-40">&#182;</a>               </div>               <p>The <code>queues</code> array maintains queues of values for each
-group.</p>             </td>             <td class="code">               <div class="highlight"><pre>                    <span class="kd">var</span> <span class="nx">queues</span> <span class="o">=</span> <span class="p">[];</span>
+<h3 id="tee"><span class="heading">tee</span> <code>tee(n=2)</code></h3>
 
-                    <span class="kd">var</span> <span class="nx">iterQueue</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                            <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-                            <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                            <span class="kd">var</span> <span class="nx">fillsQueue</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-41">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-41">&#182;</a>               </div>               <p>If we have elements in the queue, we can
-pop it off and we're done.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">if</span><span class="p">(</span><span class="nx">queues</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">return</span> <span class="nx">queues</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">pop</span><span class="p">();</span>
-                            <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-42">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-42">&#182;</a>               </div>               <p>Otherwise, we need to search the rest of the
-list for it.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                                <span class="nx">fillsQueue</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-                                <span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-43">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-43">&#182;</a>               </div>               <p>This value matches the predicate, so we're
-done.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">starts</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
-                                    <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
-                                <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-44">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-44">&#182;</a>               </div>               <p>Otherwise, this value could possibly be
-for another queue.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">queues</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                    <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">starts</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-45">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-45">&#182;</a>               </div>               <p>This value matches another queue.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                        <span class="nx">queues</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">unshift</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                                        <span class="nx">fillsQueue</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                                        <span class="k">break</span><span class="p">;</span>
-                                    <span class="p">}</span>
-                                <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-46">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-46">&#182;</a>               </div>               <p>We've filled the queue, so this isn't the
-value we're looking for.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                <span class="k">if</span><span class="p">(</span><span class="nx">fillsQueue</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-47">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-47">&#182;</a>               </div>               <p>This value actually starts a new queue.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                <span class="nx">starts</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                                <span class="nx">queues</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">value</span><span class="p">]);</span></pre></div>             </td>           </tr>                               <tr id="section-48">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-48">&#182;</a>               </div>               <p>We increment the backlog count by 1 so the
-parent iterator knows that we've created a
-new queue.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                <span class="nx">backCount</span><span class="o">++</span><span class="p">;</span>
-                            <span class="p">}</span>
-                        <span class="p">});</span>
-                    <span class="p">};</span>
+<p><code>tee</code> splits the sequence into <code>n</code> independent sequence iterators.</p>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">fillsQueue</span><span class="p">;</span>
-
-                        <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-49">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-49">&#182;</a>               </div>               <p>We may be somewhat backlogged, so yield that
-queue first.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">if</span><span class="p">(</span><span class="nx">backCount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">return</span> <span class="nx">iterQueue</span><span class="p">(</span><span class="nx">queues</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="p">(</span><span class="nx">backCount</span><span class="o">--</span><span class="p">));</span>
-                            <span class="p">}</span>
-
-                            <span class="nx">fillsQueue</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span></pre></div>             </td>           </tr>                               <tr id="section-50">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-50">&#182;</a>               </div>               <p>First of all, push this value to all interested
-queues.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">queues</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="k">if</span><span class="p">(</span><span class="nx">f</span><span class="p">(</span><span class="nx">starts</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">value</span><span class="p">))</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-51">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-51">&#182;</a>               </div>               <p>This value matches a value in starts, so
-the interested queue gets a value pushed
-to it.</p>
-
-<p>However, we've concluded that this value
-could not possibly yield a new iterator,
-so we move along to the next value.</p>             </td>             <td class="code">               <div class="highlight"><pre>                                    <span class="nx">queues</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">unshift</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                                    <span class="nx">fillsQueue</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                                    <span class="k">break</span><span class="p">;</span>
-                                <span class="p">}</span>
-                            <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-52">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-52">&#182;</a>               </div>               <p>We've filled the queue, so we haven't found the
-start of a new group yet.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">if</span><span class="p">(</span><span class="nx">fillsQueue</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-53">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-53">&#182;</a>               </div>               <p>This must be the start of a new group, so we
-create a new queue and push a new starting value
-for the queue.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="nx">starts</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                            <span class="nx">queues</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">value</span><span class="p">]);</span></pre></div>             </td>           </tr>                               <tr id="section-54">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-54">&#182;</a>               </div>               <p>Return to an iterator for this group.</p>             </td>             <td class="code">               <div class="highlight"><pre>                            <span class="k">return</span> <span class="nx">iterQueue</span><span class="p">(</span><span class="nx">starts</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-                        <span class="p">}</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-55">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-55">&#182;</a>               </div>               <h3>tee <code>tee(n=2)</code></h3>
-
-<p><code>tee</code> splits the sequence into <code>n</code> independent sequence
-iterators.</p>
-
-<p>This may allocate a large amount of additional storage, and
-<em>will</em> exhibit unbounded growth on infinite sequences.</p>
+<p>This may allocate a large amount of additional storage, and <em>will</em> exhibit
+unbounded growth on infinite sequences.</p>
 
 <p>The original iterator should not be used.</p>
 
@@ -758,238 +951,119 @@ iterators.</p>
 [ 1, 2, 3, 4, 5 ]
 &gt; iters[1].force();
 [ 1, 2, 3, 4, 5 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">tee</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">n</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-                    <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
+<h3 id="zip"><span class="heading">zip</span> <code>zip(ys, ...)</code></h3>
 
-                    <span class="kd">var</span> <span class="nx">queues</span> <span class="o">=</span> <span class="p">[];</span>
-                    <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">queues</span><span class="p">.</span><span class="nx">push</span><span class="p">([]);</span>
-                    <span class="p">}</span>
+<p><code>zip</code> takes the sequences passed to it and yields a new sequence taking an
+element from each element and placing it into an array. The length of the
+resulting sequence is the length of the shortest sequence passed in.</p>
 
-                    <span class="kd">var</span> <span class="nx">makeIter</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">queue</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                            <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
-
-                            <span class="k">if</span><span class="p">(</span><span class="nx">queue</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                                <span class="nx">value</span> <span class="o">=</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-
-                                <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                                    <span class="nx">queues</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">unshift</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                                <span class="p">}</span>
-                            <span class="p">}</span>
-
-                            <span class="k">return</span> <span class="nx">queue</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
-                        <span class="p">};</span>
-                    <span class="p">};</span>
-
-                    <span class="kd">var</span> <span class="nx">iters</span> <span class="o">=</span> <span class="p">[];</span>
-                    <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">iters</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">makeIter</span><span class="p">(</span><span class="nx">queues</span><span class="p">[</span><span class="nx">i</span><span class="p">])));</span>
-                    <span class="p">}</span>
-
-                    <span class="k">return</span> <span class="nx">iters</span><span class="p">;</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-56">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-56">&#182;</a>               </div>               <h3>zip <code>zip(ys, ...)</code></h3>
-
-<p><code>zip</code> takes the sequences passed to it and yields a new
-sequence taking an element from each element and placing it
-into an array. The length of the resulting sequence is the
-length of the shortest sequence passed in.</p>
-
-<p>This is somewhat more useful with JavaScript 1.7
-destructuring assignment.</p>
+<p>This is somewhat more useful with JavaScript 1.7 destructuring assignment.</p>
 
 <p>This is a lazy, composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).zip([2, 3, 4], [3, 4, 5]).force();
 [ [ 1, 2, 3 ], [ 2, 3, 4 ], [ 3, 4, 5 ] ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">zip</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">iters</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">);</span>
-                    <span class="nx">iters</span><span class="p">.</span><span class="nx">unshift</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-                    <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">iters</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">iters</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="nx">iters</span><span class="p">[</span><span class="nx">i</span><span class="p">]).</span><span class="nx">next</span><span class="p">;</span>
-                    <span class="p">}</span>
+<h3 id="force"><span class="heading">force</span> <code>force()</code></h3>
 
-                    <span class="k">return</span> <span class="k">new</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">Slothified</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
-                        <span class="kd">var</span> <span class="nx">output</span> <span class="o">=</span> <span class="p">[];</span>
-
-                        <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">iters</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">iters</span><span class="p">[</span><span class="nx">i</span><span class="p">]());</span>
-                        <span class="p">}</span>
-
-                        <span class="k">return</span> <span class="nx">output</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-57">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-57">&#182;</a>               </div>               <h3>force <code>force()</code></h3>
-
-<p><code>force</code> gets all the elements from the iterator and places
-them into an array.</p>
+<p><code>force</code> gets all the elements from the iterator and places them into an array.</p>
 
 <p>This is a strict, non-composable operation.</p>
 
 <pre><code>&gt; sloth.ify([1, 2, 3]).force();
 [ 1, 2, 3 ]
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">force</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">output</span> <span class="o">=</span> <span class="p">[];</span>
-                    <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
+</code></pre>
 
-                    <span class="k">for</span><span class="p">(;;)</span> <span class="p">{</span>
-                        <span class="k">try</span> <span class="p">{</span>
-                            <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-                        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="k">if</span><span class="p">(</span><span class="nx">e</span> <span class="o">!==</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
-                            <span class="k">break</span><span class="p">;</span>
-                        <span class="p">}</span>
-                        <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-                    <span class="p">}</span>
-                    <span class="k">return</span> <span class="nx">output</span><span class="p">;</span>
-                <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-58">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-58">&#182;</a>               </div>               <h2>Advanced features</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-59">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-59">&#182;</a>               </div>               <p><code>__iterator__</code> implements the iterator protocol for
-JavaScript 1.7.</p>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nx">__iterator__</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-                <span class="p">}</span>
-            <span class="p">};</span>
+<h2 id="Advanced-features">Advanced features</h2>
 
-            <span class="k">return</span> <span class="nx">Slothified</span><span class="p">;</span>
-        <span class="p">})(),</span></pre></div>             </td>           </tr>                               <tr id="section-60">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-60">&#182;</a>               </div>               <h2>Additional slothifications</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-61">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-61">&#182;</a>               </div>               <h3>range <code>range(b)</code> or <code>range(a=0, b=Infinity, step=1)</code></h3>
+<p><code>__iterator__</code> implements the iterator protocol for
+JavaScript 1.7.</p>
+
+<h2 id="Additional-slothifications">Additional slothifications</h2>
+
+<h3 id="range"><span class="heading">range</span> <code>range(b)</code> or <code>range(a=0, b=Infinity, step=1)</code></h3>
 
 <p>Create a range. Comes in two variants:</p>
 
 <ul>
-<li><p>If only a single argument <code>a</code> is provided, an iterator for a range
-from 0 to <code>a - 1</code> by a step of 1.</p></li>
-<li><p>If all three arguments are specified, a range from <code>a</code> to <code>b - 1</code>
-is created by a step of <code>step</code>. If <code>b</code> is <code>null</code>, an infinite
-range is generated.</p></li>
+<li><p>If only a single argument <code>a</code> is provided, an iterator for a range from 0 to
+<code>a - 1</code> by a step of 1.</p></li>
+<li><p>If all three arguments are specified, a range from <code>a</code> to <code>b - 1</code> is created
+by a step of <code>step</code>. If <code>b</code> is <code>null</code>, an infinite range is generated.</p></li>
 </ul>
 
-<p>Note that the end of the range does not include <code>b</code> --- this is
-influenced by Python's <code>range</code> function.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">range</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span><span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">b</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span>
-                <span class="nx">a</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-                <span class="nx">step</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">step</span> <span class="o">===</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">step</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<p>Note that the end of the range does not include <code>b</code> — this is influenced by
+Python's <code>range</code> function.</p>
 
-                <span class="k">if</span><span class="p">(</span><span class="nx">b</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="nx">b</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
-            <span class="p">}</span>
+<h3 id="repeat"><span class="heading">repeat</span> <code>repeat(x, n=Infinity)</code></h3>
 
-            <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">if</span><span class="p">(</span><span class="nx">a</span> <span class="o">&gt;=</span> <span class="nx">b</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">+=</span> <span class="nx">step</span><span class="p">)</span> <span class="o">-</span> <span class="nx">step</span><span class="p">;</span>
-            <span class="p">});</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-62">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-62">&#182;</a>               </div>               <h3>repeat <code>repeat(x, n=Infinity)</code></h3>
+<p>Repeat an element <code>n</code> times.</p>
 
-<p>Repeat an element <code>n</code> times.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">repeat</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="nx">n</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
+<h2 id="Iterators">Iterators</h2>
 
-            <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">ify</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                <span class="nx">n</span><span class="o">--</span><span class="p">;</span>
-                <span class="k">return</span> <span class="nx">x</span><span class="p">;</span>
-            <span class="p">});</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-63">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-63">&#182;</a>               </div>               <h2>Iterators</h2>
+<p>A lazy iterator in <code>sloth.js</code> is defined as a function (usually a closure)
+which can be repeatedly invoked to yield successive values of a sequence, until
+the appropriate exception, <a href="#StopIteration"><code>sloth.StopIteration</code></a>, is thrown
+to indicate the end of the sequence.</p>
 
-<p>A lazy iterator in <code>sloth.js</code> is defined as a function (usually a
-closure) which can be repeatedly invoked to yield successive values
-of a sequence, until the appropriate exception,
-<code>sloth.StopIteration</code>, is thrown to indicate the end of the
-sequence.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-64">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-64">&#182;</a>               </div>               <h3>iter <code>iter(xs)</code></h3>
+<h3 id="iter"><span class="heading">iter</span> <code>iter(xs)</code></h3>
 
-<p><code>iter</code> creates an low-level iterator for various common data
-types.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">iter</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xs</span><span class="p">)</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-65">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-65">&#182;</a>               </div>               <p>Check if the object is a function (and therefore can be used as
-an iterator).</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">if</span><span class="p">(</span><span class="nx">xs</span> <span class="o">&amp;&amp;</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">&amp;&amp;</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">call</span> <span class="o">&amp;&amp;</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">apply</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">xs</span><span class="p">;</span>
-            <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-66">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-66">&#182;</a>               </div>               <p>Check if the object has a next() function.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">next</span> <span class="o">!==</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">iterNextable</span><span class="p">(</span><span class="nx">xs</span><span class="p">);</span>
-            <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-67">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-67">&#182;</a>               </div>               <p>Check if the object is a <code>String</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">substring</span> <span class="o">!==</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">iterString</span><span class="p">(</span><span class="nx">xs</span><span class="p">);</span>
-            <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-68">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-68">&#182;</a>               </div>               <p>Check if the object is an <code>Array</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">if</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">xs</span><span class="p">)</span> <span class="o">===</span> <span class="s2">&quot;[object Array]&quot;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">iterArray</span><span class="p">(</span><span class="nx">xs</span><span class="p">);</span>
-            <span class="p">}</span>
+<p><code>iter</code> creates an low-level iterator for various common data types.</p>
 
-            <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">iterObject</span><span class="p">(</span><span class="nx">xs</span><span class="p">);</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-69">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-69">&#182;</a>               </div>               <h3>iterArray <code>iterArray(array)</code></h3>
+<h3 id="iterArray"><span class="heading">iterArray</span> <code>iterArray(array)</code></h3>
 
-<p>Create an iterator for an array. Note that this is the low-level
-iterator and needs to be <code>new sloth.Slothified</code>ed for useful things.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">iterArray</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<p>Create an iterator for an array. Note that this is the low-level iterator.</p>
 
-            <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">if</span><span class="p">(</span><span class="nx">i</span> <span class="o">&gt;=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                <span class="k">return</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="o">++</span><span class="p">];</span>
-            <span class="p">};</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-70">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-70">&#182;</a>               </div>               <h3>iterString <code>iterString(string)</code></h3>
+<h3 id="iterString"><span class="heading">iterString</span> <code>iterString(string)</code></h3>
 
-<p>Create an iterator for a string.  Note that this is the low-level
-iterator and needs to be <code>new sloth.Slothified</code>ed for useful things.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">iterString</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<p>Create an iterator for a string.  Note that this is the low-level iterator.</p>
 
-            <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">if</span><span class="p">(</span><span class="nx">i</span> <span class="o">&gt;=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">StopIteration</span><span class="p">;</span>
-                <span class="k">return</span> <span class="nx">string</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="nx">i</span><span class="o">++</span><span class="p">);</span>
-            <span class="p">};</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-71">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-71">&#182;</a>               </div>               <h3>iterObject <code>iterObject(string)</code></h3>
+<h3 id="iterObject"><span class="heading">iterObject</span> <code>iterObject(string)</code></h3>
 
-<p>Create an iterator for an object which yields pairs of keys and
-values. This will immediately read in the object and generate a
-list of its keys and values and, as such, won't reflect any changes
-to the object.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">iterObject</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">items</span> <span class="o">=</span> <span class="p">[];</span>
-            <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">k</span> <span class="k">in</span> <span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">k</span><span class="p">))</span> <span class="k">continue</span><span class="p">;</span>
-                <span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">k</span><span class="p">,</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">k</span><span class="p">]]);</span>
-            <span class="p">}</span>
-            <span class="k">return</span> <span class="nx">sloth</span><span class="p">.</span><span class="nx">iterArray</span><span class="p">(</span><span class="nx">items</span><span class="p">);</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-72">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-72">&#182;</a>               </div>               <h3>iterNextable <code>iterNextable(nextable)</code></h3>
+<p>Create an iterator for an object which yields pairs of keys and values. This
+will immediately read in the object and generate a list of its keys and values
+and, as such, won't reflect any future changes to the object.</p>
 
-<p>Create an iterator for an object with a .next() function
-(such as generators in JavaScript 1.7).</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">iterNextable</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">nextable</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">nextable</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
-            <span class="p">};</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-73">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-73">&#182;</a>               </div>               <h3>StopIteration <code>StopIteration</code></h3>
+<h3 id="iterNextable"><span class="heading">iterNextable</span> <code>iterNextable(nextable)</code></h3>
 
-<p><code>StopIteration</code> is an object which is thrown to indicate that the
-iterator has no more data left to yield, i.e. an end-of-stream
-situation.</p>
+<p>Create an iterator for an object with a .next() function (such as generators in
+JavaScript 1.7).</p>
 
-<p>A common example of this reaching the end of an array in a
-traditional <code>for</code> loop.</p>
+<h2 id="StopIteration"><span class="heading">StopIteration</span> <code>StopIteration</code></h2>
 
-<p>Some JavaScript engines (presently SpiderMonkey) support
-<code>StopIteration</code> exceptions.</p>
+<p><code>StopIteration</code> is an object which is thrown to indicate that the iterator has
+no more data left to yield, i.e. an end-of-stream situation.</p>
 
-<p><code>StopIteration</code> instances must <em>not</em> be instantiated --- it is a
-singleton exception object which is designed to be thrown as is.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">StopIteration</span><span class="o">:</span> <span class="k">typeof</span> <span class="nx">StopIteration</span> <span class="o">!==</span> <span class="s2">&quot;undefined&quot;</span> <span class="o">?</span>
-                       <span class="nx">StopIteration</span> <span class="o">:</span>
-                       <span class="p">{},</span></pre></div>             </td>           </tr>                               <tr id="section-74">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-74">&#182;</a>               </div>               <h2>Utility functions</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-75">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-75">&#182;</a>               </div>               <h3>id <code>id(x)</code></h3>
+<p>A common example of this reaching the end of an array in a traditional <code>for</code>
+loop.</p>
 
-<p>A function where, given a value, returns the value (a la Haskell).</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">id</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">x</span><span class="p">;</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-76">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-76">&#182;</a>               </div>               <h3>cmp <code>cmp(a, b)</code></h3>
+<p>Some JavaScript engines (presently SpiderMonkey) support <code>StopIteration</code>
+exceptions.</p>
+
+<p><code>StopIteration</code> instances must <em>not</em> be instantiated --- it is a singleton
+exception object which is designed to be thrown as is.</p>
+
+<h2 id="Utility-functions">Utility functions</h2>
+
+<h3 id="id"><span class="heading">id</span> <code>id(x)</code></h3>
+
+<p>A function where, given a value, returns the value (á la Haskell).</p>
+
+<h3 id="cmp"><span class="heading">cmp</span> <code>cmp(a, b)</code></h3>
 
 <p>The default comparison function, combining both lexicographic and
-numerical semantics.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">cmp</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">a</span> <span class="o">&lt;</span> <span class="nx">b</span> <span class="o">?</span> <span class="o">-</span><span class="mi">1</span> <span class="o">:</span>
-                   <span class="nx">a</span> <span class="o">&gt;</span> <span class="nx">b</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span>
-                   <span class="mi">0</span><span class="p">;</span>
-        <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-77">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-77">&#182;</a>               </div>               <h3>eq <code>eq(a, b)</code></h3>
+numerical semantics.</p>
+
+<h3 id="eq"><span class="heading">eq</span> <code>eq(a, b)</code></h3>
 
 <p>The default equality function, which returns the strict equality of
-two values.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">eq</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">a</span> <span class="o">===</span> <span class="nx">b</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-78">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-78">&#182;</a>               </div>               <h2>Finale</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-79">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-79">&#182;</a>               </div>               <p>Export <code>sloth.js</code> appropriately for Node.js and the browser.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">module</span> <span class="o">!==</span> <span class="s2">&quot;undefined&quot;</span> <span class="o">&amp;&amp;</span> <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nb">window</span> <span class="o">!==</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nb">window</span><span class="p">.</span><span class="nx">sloth</span> <span class="o">=</span> <span class="nx">sloth</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">})();</span>
-
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+two values.</p>
+    </div>
+    <div class="footer">
+        Generated by <a href="https://rfw.github.com/owldoc">Owldoc</a> — a hooting good time!
+    </div>
+    </body>
+</html>
